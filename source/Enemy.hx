@@ -7,10 +7,14 @@ class Enemy extends Entity {
     var _velocity:FlxVector = new FlxVector();
     var ENEMY_SPEED = 100;
 
-    public function new(x:Int, y:Int, playerToChase:Entity) {
-        super(x, y);
+    public function new(wave:Int, playerToChase:Entity) {
+        super();
         makeGraphic(24,24,0xFFFF0000);
+        
         _playerToChase = playerToChase;
+
+        setHealthByWave(wave);
+
         _velocity.x = 0;
         _velocity.y = 0;
     }
@@ -18,6 +22,10 @@ class Enemy extends Entity {
     override public function update(elapsed:Float):Void {
         super.update(elapsed);
         chasePlayer();
+    }
+
+    function setHealthByWave(wave:Int) {
+        health = 2 + wave;
     }
 
     function chasePlayer(){

@@ -4,14 +4,18 @@ import flixel.FlxG;
 import flixel.group.FlxGroup;
 import flixel.math.FlxVector;
 import flixel.util.FlxTimer;
+import flixel.system.FlxSound;
 
 class Survivor extends Entity {
     var _bullets:FlxTypedGroup<Bullet>;
     var _velocity:FlxVector = new FlxVector();
     var _shootTimer = new FlxTimer();
-    static var PLAYER_SPEED = 5;
+    static var PLAYER_SPEED = 1.5;
     static var BULLET_SPEED = 2048;
     static var FIRE_RATE:Float = 1 / 8;
+    
+	 // Sound effects
+	 var _sndPistolShot:FlxSound;
 
     public function new(x:Int, y:Int, bullets:FlxTypedGroup<Bullet>) {
         super(x, y);
@@ -25,6 +29,8 @@ class Survivor extends Entity {
 
         _bullets = bullets;
         giveInitialBullets();
+        
+		_sndPistolShot = FlxG.sound.load(AssetPaths.pistol_shot__wav);
 
         _velocity.x = 0;
         _velocity.y = 0;
@@ -76,5 +82,8 @@ class Survivor extends Entity {
         bullet.angularVelocity = 1024;
         bullet.velocity.x = _velocity.x;
         bullet.velocity.y = _velocity.y;
+
+        _sndPistolShot.play(true);
+        //_sndPistolShot.loadEmbedded(AssetPaths.pistol_shot__wav);
     }
 }

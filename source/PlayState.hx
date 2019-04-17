@@ -24,6 +24,7 @@ class PlayState extends FlxState {
 	// Tilemap
 	var _map:FlxOgmoLoader;
  	var _mWalls:FlxTilemap;
+ 	var _mGround:FlxTilemap;
 
 	override public function create():Void {
 		_map = new FlxOgmoLoader(AssetPaths.level0__oel);
@@ -31,7 +32,10 @@ class PlayState extends FlxState {
 		_mWalls.follow();
 		_mWalls.setTileProperties(1, FlxObject.NONE);
 		_mWalls.setTileProperties(2, FlxObject.ANY);
-		add(_mWalls);
+		
+		_mGround = _map.loadTilemap(AssetPaths.dungeon_tiles__png, 8, 8, "ground");
+		//add(_mWalls);
+		//add(_mGround);
 
 		_survivor = new Survivor(200, 200, _bullets);
 		_survivor.x = FlxG.width / 2 - _survivor.width;
@@ -39,6 +43,7 @@ class PlayState extends FlxState {
 		playerHealth = _survivor.health;
 
 		_map.loadEntities(placeEntities, "entities");
+
 
 		add(_survivor);
 		add(_bullets);
@@ -57,7 +62,7 @@ class PlayState extends FlxState {
 		FlxG.overlap(_bullets, _enemies, onOverlap);
 		playerHealth = _survivor.health;
 		checkIfWaveIsOver();
-		FlxG.collide(_survivor, _mWalls);
+		//FlxG.collide(_survivor, _mWalls);
 	}
 
 	function checkIfWaveIsOver() {

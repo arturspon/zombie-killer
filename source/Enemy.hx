@@ -5,7 +5,7 @@ import flixel.math.FlxVector;
 class Enemy extends Entity {
     var _playerToChase:Entity;
     var _velocity:FlxVector = new FlxVector();
-    var ENEMY_SPEED = 100;
+    var ENEMY_SPEED = 10;
 
     public function new(wave:Int, playerToChase:Entity) {
         super();

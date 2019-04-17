@@ -10,7 +10,7 @@ class HUD extends FlxGroup{
     public function new(){
         super();
 
-        _health = new FlxText(5, 5, 0, "Health: ", 12);
+        _health = new FlxText(5, 5, 0, "Health: ", 16);
 
         add(_health);
     }

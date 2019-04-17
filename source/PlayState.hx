@@ -13,6 +13,7 @@ class PlayState extends FlxState {
     var _enemies:FlxTypedGroup<Enemy> = new FlxTypedGroup<Enemy>();
 	var _currentWave = 0;
 	var _enemies_in_this_wave:Int;
+	var _enemies_killed_in_this_wave:Int = 0;
 
 	var _hud:HUD = new HUD();
 
@@ -20,6 +21,8 @@ class PlayState extends FlxState {
 
 	override public function create():Void {
 		_survivor = new Survivor(200, 200, _bullets);
+		_survivor.x = FlxG.width / 2 - _survivor.width;
+		_survivor.y = FlxG.height / 2 - 16;
 		playerHealth = _survivor.health;
 
 		add(_survivor);
@@ -36,7 +39,18 @@ class PlayState extends FlxState {
 	override public function update(elapsed:Float):Void	{
 		super.update(elapsed);
 		FlxG.overlap(_survivor, _enemies, onOverlap);
+		FlxG.overlap(_bullets, _enemies, onOverlap);
 		playerHealth = _survivor.health;
+		checkIfWaveIsOver();
+	}
+
+	function checkIfWaveIsOver() {
+		if(_enemies_in_this_wave == _enemies_killed_in_this_wave) {
+			_enemies_killed_in_this_wave = 0;
+			_currentWave++;
+			populateWave();
+			enemySpawner();
+		}
 	}
 
 	function populateWave() {
@@ -80,9 +94,15 @@ class PlayState extends FlxState {
 		add(enemy);
 	}
 
-	function onOverlap(Sprite1:FlxObject, Sprite2:FlxObject):Void {
-		if (Std.is(Sprite1, Survivor))
-			Sprite1.hurt(1);
+	function onOverlap(s1:FlxObject, s2:FlxObject):Void {
+		if (Std.is(s1, Survivor))
+			s1.hurt(1);
+		if(Std.is(s1, Bullet)){
+				s2.hurt(1);
+			if(!s2.alive){
+				_enemies_killed_in_this_wave++;
+			}
+		}
 	}
 
 }

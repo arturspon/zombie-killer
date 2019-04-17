@@ -12,7 +12,7 @@ import flixel.tile.FlxTilemap;
 class PlayState extends FlxState {
 	var _survivor:Survivor;
     var _bullets:FlxTypedGroup<Bullet> = new FlxTypedGroup<Bullet>();
-    var _enemies:FlxTypedGroup<Enemy> = new FlxTypedGroup<Enemy>();
+    var _enemies:FlxTypedGroup<Enemy>;
 	var _enemies_in_this_wave:Int;
 	var _enemies_killed_in_this_wave:Int = 0;
 
@@ -75,6 +75,7 @@ class PlayState extends FlxState {
 	}
 
 	function populateWave() {
+		_enemies = new FlxTypedGroup<Enemy>();
 		_enemies_in_this_wave = currentWave * 2 + 5;
 		for(i in 0..._enemies_in_this_wave){
 			var enemy = new Enemy(currentWave, _survivor);

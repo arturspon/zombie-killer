@@ -10,7 +10,7 @@ class Survivor extends Entity {
     var _bullets:FlxTypedGroup<Bullet>;
     var _velocity:FlxVector = new FlxVector();
     var _shootTimer = new FlxTimer();
-    static var PLAYER_SPEED = 1.5;
+    static var PLAYER_SPEED = 2.5;
     static var BULLET_SPEED = 2048;
     static var FIRE_RATE:Float = 1 / 8;
     
@@ -20,7 +20,7 @@ class Survivor extends Entity {
     public function new(x:Int, y:Int, bullets:FlxTypedGroup<Bullet>) {
         super(x, y);
         health = 10;
-        makeGraphic(8, 8, 0xFFFFFFFF);
+        makeGraphic(16, 16, 0xFFFFFFFF);
         /*loadGraphic(AssetPaths.kkkk__png, true, 258, 220);
         animation.add("move", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 15, true);
         animation.play("move");*/

@@ -5,7 +5,7 @@ import flixel.FlxSprite;
 class Bullet extends FlxSprite {
     public function new() {
         super();
-        makeGraphic(8, 8, 0xFFFF0000);
+        makeGraphic(16, 16, 0xFFFF0000);
     }
 
     override public function update(elapsed:Float):Void {

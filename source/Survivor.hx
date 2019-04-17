@@ -6,7 +6,9 @@ import flixel.math.FlxVector;
 
 class Survivor extends Entity {
     var _bullets:FlxTypedGroup<Bullet>;
-    var _velocity:FlxVector = new FlxVector(); 
+    var _velocity:FlxVector = new FlxVector();
+    var PLAYER_SPEED = 5;
+    var BULLET_SPEED = 2048;
 
     public function new(x:Int, y:Int, bullets:FlxTypedGroup<Bullet>) {
         super(x, y);
@@ -39,6 +41,18 @@ class Survivor extends Entity {
         if(FlxG.mouse.justPressed) {
             shoot();
         }
+        if(FlxG.keys.pressed.A && x > 0){
+            x -= PLAYER_SPEED;
+        }
+        if(FlxG.keys.pressed.D && x < FlxG.width - width){
+            x += PLAYER_SPEED;
+        }
+        if(FlxG.keys.pressed.W && y > 0){
+            y -= PLAYER_SPEED;
+        }
+        if(FlxG.keys.pressed.S && y < FlxG.height - height){
+            y += PLAYER_SPEED;
+        }
     }
 
     function shoot() {
@@ -47,7 +61,7 @@ class Survivor extends Entity {
         _velocity.x = FlxG.mouse.x - x;
         _velocity.y = FlxG.mouse.y - y;
         _velocity.normalize();
-        _velocity.scale(512);
+        _velocity.scale(BULLET_SPEED);
         
         bullet.reset(x + width / 2, y - height / 2);
         bullet.angularVelocity = 1024;

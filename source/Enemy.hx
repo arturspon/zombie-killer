@@ -9,7 +9,7 @@ class Enemy extends Entity {
 
     public function new(wave:Int, playerToChase:Entity) {
         super();
-        makeGraphic(24,24,0xFFFF0000);
+        makeGraphic(8, 8, 0xFFFF0000);
         
         _playerToChase = playerToChase;
 

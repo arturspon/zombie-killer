@@ -94,6 +94,10 @@ null
 #if flash
 
 @:keep @:bind #if display private #end class __ASSET__assets_data_data_goes_here_txt extends null { }
+@:keep @:bind #if display private #end class __ASSET__assets_data_level0_oel extends null { }
+@:keep @:bind #if display private #end class __ASSET__assets_data_map0_oep extends null { }
+@:keep @:bind #if display private #end class __ASSET__assets_data_unsaved_level_oel extends null { }
+@:keep @:bind #if display private #end class __ASSET__assets_images_dungeon_tiles_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep @:bind #if display private #end class __ASSET__assets_images_survivor_image_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep @:bind #if display private #end class __ASSET__assets_images_survivor_kkkk_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep @:bind #if display private #end class __ASSET__assets_images_survivor_spritesheet_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }

@@ -6,24 +6,39 @@ import flixel.util.FlxTimer;
 import flixel.FlxState;
 import flixel.group.FlxGroup;
 import flixel.math.FlxRandom;
+import flixel.addons.editors.ogmo.FlxOgmoLoader;
+import flixel.tile.FlxTilemap;
 
 class PlayState extends FlxState {
 	var _survivor:Survivor;
     var _bullets:FlxTypedGroup<Bullet> = new FlxTypedGroup<Bullet>();
     var _enemies:FlxTypedGroup<Enemy> = new FlxTypedGroup<Enemy>();
-	var _currentWave = 0;
 	var _enemies_in_this_wave:Int;
 	var _enemies_killed_in_this_wave:Int = 0;
 
 	var _hud:HUD = new HUD();
 
 	public var playerHealth:Float;
+	public var currentWave = 0;
+
+	// Tilemap
+	var _map:FlxOgmoLoader;
+ 	var _mWalls:FlxTilemap;
 
 	override public function create():Void {
+		_map = new FlxOgmoLoader(AssetPaths.level0__oel);
+		_mWalls = _map.loadTilemap(AssetPaths.dungeon_tiles__png, 8, 8, "walls");
+		_mWalls.follow();
+		_mWalls.setTileProperties(1, FlxObject.NONE);
+		_mWalls.setTileProperties(2, FlxObject.ANY);
+		add(_mWalls);
+
 		_survivor = new Survivor(200, 200, _bullets);
 		_survivor.x = FlxG.width / 2 - _survivor.width;
 		_survivor.y = FlxG.height / 2 - 16;
 		playerHealth = _survivor.health;
+
+		_map.loadEntities(placeEntities, "entities");
 
 		add(_survivor);
 		add(_bullets);
@@ -42,21 +57,22 @@ class PlayState extends FlxState {
 		FlxG.overlap(_bullets, _enemies, onOverlap);
 		playerHealth = _survivor.health;
 		checkIfWaveIsOver();
+		FlxG.collide(_survivor, _mWalls);
 	}
 
 	function checkIfWaveIsOver() {
 		if(_enemies_in_this_wave == _enemies_killed_in_this_wave) {
 			_enemies_killed_in_this_wave = 0;
-			_currentWave++;
+			currentWave++;
 			populateWave();
 			enemySpawner();
 		}
 	}
 
 	function populateWave() {
-		_enemies_in_this_wave = _currentWave * 2 + 5;
+		_enemies_in_this_wave = currentWave * 2 + 5;
 		for(i in 0..._enemies_in_this_wave){
-			var enemy = new Enemy(_currentWave, _survivor);
+			var enemy = new Enemy(currentWave, _survivor);
 			enemy.kill();
 			_enemies.add(enemy);
 		}
@@ -105,4 +121,12 @@ class PlayState extends FlxState {
 		}
 	}
 
+	function placeEntities(entityName:String, entityData:Xml):Void {
+     var x:Int = Std.parseInt(entityData.get("x"));
+     var y:Int = Std.parseInt(entityData.get("y"));
+     if (entityName == "player") {
+         _survivor.x = x;
+         _survivor.y = y;
+     }
+ }
 }

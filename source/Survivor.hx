@@ -3,20 +3,25 @@ package;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
 import flixel.math.FlxVector;
+import flixel.util.FlxTimer;
 
 class Survivor extends Entity {
     var _bullets:FlxTypedGroup<Bullet>;
     var _velocity:FlxVector = new FlxVector();
-    var PLAYER_SPEED = 5;
-    var BULLET_SPEED = 2048;
+    var _shootTimer = new FlxTimer();
+    static var PLAYER_SPEED = 5;
+    static var BULLET_SPEED = 2048;
+    static var FIRE_RATE:Float = 1 / 8;
 
     public function new(x:Int, y:Int, bullets:FlxTypedGroup<Bullet>) {
         super(x, y);
         health = 10;
-        makeGraphic(24,24,0xFFFFFFFF);
+        makeGraphic(8, 8, 0xFFFFFFFF);
         /*loadGraphic(AssetPaths.kkkk__png, true, 258, 220);
         animation.add("move", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 15, true);
         animation.play("move");*/
+
+        setSize(4, 4);
 
         _bullets = bullets;
         giveInitialBullets();
@@ -57,6 +62,9 @@ class Survivor extends Entity {
     }
 
     function shoot() {
+        if (_shootTimer.active) return;
+        _shootTimer.start(FIRE_RATE);
+
         var bullet = _bullets.getFirstAvailable();
 
         _velocity.x = FlxG.mouse.x - x;

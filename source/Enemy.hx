@@ -1,5 +1,6 @@
 package;
 
+import flixel.math.FlxAngle;
 import flixel.FlxG;
 import flixel.math.FlxVector;
 import flixel.math.FlxRandom;
@@ -12,7 +13,13 @@ class Enemy extends Entity {
 
     public function new(wave:Int, playerToChase:Entity) {
         super();
-        makeGraphic(16, 16, 0xFFFF0000);
+        //makeGraphic(16, 16, 0xFFFF0000);
+        loadGraphic(AssetPaths.zombie_running__png, true, 288, 311);
+        animation.add("move", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], 16, true);
+        animation.play("move");
+
+        setGraphicSize(48, 48);
+        updateHitbox();
         
         _playerToChase = playerToChase;
 
@@ -50,8 +57,6 @@ class Enemy extends Entity {
         }
         
         ENEMY_SPEED = speed;
-
-        FlxG.log.add(wave + ' - ' + ENEMY_SPEED);
     }
 
     function chasePlayer(){
@@ -62,5 +67,7 @@ class Enemy extends Entity {
         
         velocity.x = _velocity.x;
         velocity.y = _velocity.y;
+
+        angle = FlxAngle.angleBetween(_playerToChase, this, true) - 180;
     }
 }

@@ -60,6 +60,7 @@ class PlayState extends FlxState {
 		super.update(elapsed);
 		FlxG.overlap(_survivor, _enemies, onOverlap);
 		FlxG.overlap(_bullets, _enemies, onOverlap);
+		FlxG.collide(_enemies, _enemies);
 		playerHealth = _survivor.health;
 		checkIfWaveIsOver();
 		//FlxG.collide(_survivor, _mWalls);

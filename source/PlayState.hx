@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxSprite;
 import lime.math.Vector2;
 import flixel.FlxObject;
 import flixel.FlxG;
@@ -7,17 +8,16 @@ import flixel.util.FlxTimer;
 import flixel.FlxState;
 import flixel.group.FlxGroup;
 import flixel.math.FlxRandom;
-import flixel.addons.editors.ogmo.FlxOgmoLoader;
 import flixel.tile.FlxTilemap;
 
 class PlayState extends FlxState {
+	var _hud:HUD;
 	var _survivor:Survivor;
     var _bullets:FlxTypedGroup<Bullet> = new FlxTypedGroup<Bullet>();
-    var _enemies:FlxTypedGroup<Enemy>;
+    var _enemies:FlxTypedGroup<Enemy> = new FlxTypedGroup<Enemy>();
 	var _enemies_in_this_wave:Int;
 	var _enemies_killed_in_this_wave:Int = 0;
 
-	var _hud:HUD = new HUD();
 
 	public var playerHealth:Float;
 	public var currentWave = 0;
@@ -47,6 +47,8 @@ class PlayState extends FlxState {
 		add(_survivor);
 		add(_bullets);
 		add(_enemies);
+
+		_hud = new HUD();
 		add(_hud);
 
 		populateWave();

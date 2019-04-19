@@ -50,6 +50,7 @@ class Survivor extends Entity {
     }
 
     function checkInputs() {
+        // Movement and combat
         if(FlxG.mouse.justPressed) {
             shoot();
         }
@@ -65,6 +66,9 @@ class Survivor extends Entity {
         if(FlxG.keys.pressed.S && y < FlxG.height - height){
             y += PLAYER_SPEED;
         }
+
+        // Inventory
+        updateInventorySelectedItem();
     }
 
     function shoot() {
@@ -85,5 +89,23 @@ class Survivor extends Entity {
 
         _sndPistolShot.play(true);
         //_sndPistolShot.loadEmbedded(AssetPaths.pistol_shot__wav);
+    }
+    
+    function updateInventorySelectedItem() {
+        if(FlxG.keys.justPressed.ONE) {
+            PlayState.currentInventorySelectedItem = 0;
+        }
+        if(FlxG.keys.justPressed.TWO) {
+            PlayState.currentInventorySelectedItem = 1;
+        }
+        if(FlxG.keys.justPressed.THREE) {
+            PlayState.currentInventorySelectedItem = 2;
+        }
+        if(FlxG.keys.justPressed.FOUR) {
+            PlayState.currentInventorySelectedItem = 3;
+        }
+        if(FlxG.keys.justPressed.FIVE) {
+            PlayState.currentInventorySelectedItem = 4;
+        }
     }
 }

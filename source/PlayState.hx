@@ -18,7 +18,6 @@ class PlayState extends FlxState {
 	var _enemies_in_this_wave:Int;
 	var _enemies_killed_in_this_wave:Int = 0;
 
-
 	public var playerHealth:Float;
 	public var currentWave = 0;
 
@@ -29,6 +28,14 @@ class PlayState extends FlxState {
 	// Spawn points
 	static var SURVIVOR_SPAWN_POINT:Vector2 = new Vector2(317, 89);
 	static var ENEMIES_SPAWN_POINT_LIST:Array<Vector2>;
+
+	// Player's inventory
+	public static var currentInventorySelectedItem:Int = 0;
+	public var inventoryItemsList:Array<Int>;
+
+	// Items
+	public static inline var WEAPON_PISTOL = 0;
+	public static inline var WEAPON_RIFLE = 1;
 
 	override public function create():Void {
 		// Spawn points
@@ -43,6 +50,10 @@ class PlayState extends FlxState {
 
 		_survivor = new Survivor(cast(SURVIVOR_SPAWN_POINT.x, Int), cast(SURVIVOR_SPAWN_POINT.y, Int), _bullets);
 		playerHealth = _survivor.health;
+
+		// Start inventory with a weapon
+ 		inventoryItemsList = new Array<Int>();
+		inventoryItemsList.push(WEAPON_PISTOL);
 
 		add(_survivor);
 		add(_bullets);

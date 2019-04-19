@@ -11,7 +11,7 @@ import flixel.math.FlxRandom;
 import flixel.tile.FlxTilemap;
 
 class PlayState extends FlxState {
-	var _hud:HUD;
+	public static var _hud:HUD;
 	var _survivor:Survivor;
     var _bullets:FlxTypedGroup<Bullet> = new FlxTypedGroup<Bullet>();
     var _enemies:FlxTypedGroup<Enemy> = new FlxTypedGroup<Enemy>();
@@ -31,7 +31,7 @@ class PlayState extends FlxState {
 
 	// Player's inventory
 	public static var currentInventorySelectedItem:Int = 0;
-	public var inventoryItemsList:Array<Int>;
+	public static var inventoryItemsList:Array<Int>;
 
 	// Items
 	public static inline var WEAPON_PISTOL = 0;
@@ -123,13 +123,4 @@ class PlayState extends FlxState {
 			}
 		}
 	}
-
-	function placeEntities(entityName:String, entityData:Xml):Void {
-     var x:Int = Std.parseInt(entityData.get("x"));
-     var y:Int = Std.parseInt(entityData.get("y"));
-     if (entityName == "player") {
-         _survivor.x = x;
-         _survivor.y = y;
-     }
- }
 }

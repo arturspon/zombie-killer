@@ -94,18 +94,23 @@ class Survivor extends Entity {
     function updateInventorySelectedItem() {
         if(FlxG.keys.justPressed.ONE) {
             PlayState.currentInventorySelectedItem = 0;
+            PlayState._hud.updateInventory();
         }
         if(FlxG.keys.justPressed.TWO) {
             PlayState.currentInventorySelectedItem = 1;
+            PlayState._hud.updateInventory();
         }
         if(FlxG.keys.justPressed.THREE) {
             PlayState.currentInventorySelectedItem = 2;
+            PlayState._hud.updateInventory();
         }
         if(FlxG.keys.justPressed.FOUR) {
             PlayState.currentInventorySelectedItem = 3;
+            PlayState._hud.updateInventory();
         }
         if(FlxG.keys.justPressed.FIVE) {
             PlayState.currentInventorySelectedItem = 4;
+            PlayState._hud.updateInventory();
         }
     }
 }

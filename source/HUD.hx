@@ -18,7 +18,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     var inventorySpaceSquareSize = 32;
     var inventorySpaces = 5;
     var inventoryBarTotalWidth:Int;
-    var _inventoryItemSpritePadding = 12;
+    var _inventoryItemSpritePadding = 8;
     var _inventoryRenderedItems:Array<Int> = new Array<Int>(); // Items that have already been rendered to HUD
     var _inventoryNumberTextList:Array<FlxText> = new Array<FlxText>();
     
@@ -32,6 +32,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         // Player's inventory
         inventoryBarTotalWidth = inventorySpaceSquareSize * inventorySpaces;
         drawInventorySpaces();
+        updateInventory();
 
         add(_health);
         add(_wave);    
@@ -42,7 +43,6 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         var s:PlayState = cast FlxG.state;
         _health.text = "Health: " + s.playerHealth;
         _wave.text = "Wave " + (s.currentWave + 1);
-        updateInventory(s.inventoryItemsList);
 
         super.update(elapsed);
     }
@@ -62,17 +62,23 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         }
     }
 
-    function updateInventory(inventoryItemsList:Array<Int>) {
+    public function updateInventory() {
         // Draw items in inventory bar
-        for(item in inventoryItemsList) {
+        for(item in PlayState.inventoryItemsList) {
             if(_inventoryRenderedItems.indexOf(item) < 0) {
                 var xPositionToRenderItem = FlxG.width / 2 - inventoryBarTotalWidth / 2 + inventorySpaceSquareSize * _inventoryRenderedItems.length;
+
 
                 switch(item) {
                     case PlayState.WEAPON_PISTOL:
                         var s = new FlxSprite(xPositionToRenderItem, 4);
                         s.loadGraphic(AssetPaths.Tokarev_TT_33__png, false);
-                        s.setGraphicSize(inventorySpaceSquareSize - _inventoryItemSpritePadding, inventorySpaceSquareSize - _inventoryItemSpritePadding);
+
+                        // Resizing the sprite but keeping it's aspect ratio
+                        var aspectRatio = s.width / s.height;
+                        var adjustedHeight = cast(inventorySpaceSquareSize / aspectRatio, Int);
+                        
+                        s.setGraphicSize(inventorySpaceSquareSize - _inventoryItemSpritePadding, adjustedHeight - _inventoryItemSpritePadding);
                         add(s);
                     //case PlayState.WEAPON_RIFLE:
                 }

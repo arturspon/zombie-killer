@@ -23,28 +23,16 @@ class PlayState extends FlxState {
 	public var currentWave = 0;
 
 	// Tilemap
-	/*var _map:FlxOgmoLoader;
- 	var _mWalls:FlxTilemap;
- 	var _mGround:FlxTilemap;*/
 	var _mapWalls:FlxTilemap;
 	var _mapGround:FlxTilemap;
 
 	// Spawn points
 	static var SURVIVOR_SPAWN_POINT:Vector2 = new Vector2(317, 89);
-	static var ENEMIES_SPAWN_POINT_LIST = [new Vector2(-8, 238), new Vector2(FlxG.width, 134), new Vector2(FlxG.width, 213), new Vector2(475, FlxG.height)];
+	static var ENEMIES_SPAWN_POINT_LIST:Array<Vector2>;
 
 	override public function create():Void {
-		/*_map = new FlxOgmoLoader(AssetPaths.level0__oel);
-		_mWalls = _map.loadTilemap(AssetPaths.dungeon_tiles__png, 8, 8, "walls");
-		_mWalls.follow();
-		_mWalls.setTileProperties(1, FlxObject.NONE);
-		_mWalls.setTileProperties(2, FlxObject.ANY);
-		
-		_mGround = _map.loadTilemap(AssetPaths.dungeon_tiles__png, 8, 8, "ground");
-		//add(_mWalls);
-		//add(_mGround);		
-
-		_map.loadEntities(placeEntities, "entities");*/
+		// Spawn points
+		ENEMIES_SPAWN_POINT_LIST = [new Vector2(-8, 238), new Vector2(FlxG.width, 134), new Vector2(FlxG.width, 213), new Vector2(475, FlxG.height)];
 
 		_mapWalls = new FlxTilemap();
 		_mapWalls.loadMapFromCSV("assets/data/cave_walls.csv", "assets/images/cave_tileset.png", 16, 16, 0, 1);
@@ -76,10 +64,6 @@ class PlayState extends FlxState {
 		FlxG.collide(_enemies, _mapWalls);
 		checkIfWaveIsOver();
 		playerHealth = _survivor.health;
-
-		if(FlxG.mouse.justPressed) {
-			FlxG.log.add(FlxG.mouse.x + " - " + FlxG.mouse.y);
-		}
 	}
 
 	function checkIfWaveIsOver() {
@@ -108,28 +92,10 @@ class PlayState extends FlxState {
 
 	function spawnEnemy(deltaTime:FlxTimer) {
 		var random = new FlxRandom();
-
-		var xToSpawn:Int = 0;
-		var yToSpawn:Int = 0;
-
-		// Spawn side
-		switch(random.int(0, 3)) {
-			case 0:
-				xToSpawn = -10;
-				yToSpawn = random.int(0, FlxG.height);
-			case 1:
-				xToSpawn = random.int(0, FlxG.width);
-				yToSpawn = FlxG.height + 10;
-			case 2:	
-				xToSpawn = FlxG.width + 10;
-				yToSpawn = random.int(0, FlxG.height);
-			case 3:
-				xToSpawn = random.int(0, FlxG.width);
-				yToSpawn = -10;
-		}
+		var pointToSpawn:Vector2 = ENEMIES_SPAWN_POINT_LIST[random.int(0, ENEMIES_SPAWN_POINT_LIST.length - 1)];
 		
 		var enemy:Enemy = _enemies.getFirstAvailable();
-		enemy.reset(xToSpawn, yToSpawn);
+		enemy.reset(pointToSpawn.x, pointToSpawn.y);
 		add(enemy);
 	}
 

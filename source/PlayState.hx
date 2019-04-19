@@ -1,5 +1,6 @@
 package;
 
+import lime.math.Vector2;
 import flixel.FlxObject;
 import flixel.FlxG;
 import flixel.util.FlxTimer;
@@ -28,6 +29,10 @@ class PlayState extends FlxState {
 	var _mapWalls:FlxTilemap;
 	var _mapGround:FlxTilemap;
 
+	// Spawn points
+	static var SURVIVOR_SPAWN_POINT:Vector2 = new Vector2(317, 89);
+	static var ENEMIES_SPAWN_POINT_LIST = [new Vector2(-8, 238), new Vector2(FlxG.width, 134), new Vector2(FlxG.width, 213), new Vector2(475, FlxG.height)];
+
 	override public function create():Void {
 		/*_map = new FlxOgmoLoader(AssetPaths.level0__oel);
 		_mWalls = _map.loadTilemap(AssetPaths.dungeon_tiles__png, 8, 8, "walls");
@@ -42,15 +47,13 @@ class PlayState extends FlxState {
 		_map.loadEntities(placeEntities, "entities");*/
 
 		_mapWalls = new FlxTilemap();
-		_mapWalls.loadMapFromCSV("assets/data/cave_walls.txt", "assets/images/cave_tileset.png", 16, 16, 0, 1);
+		_mapWalls.loadMapFromCSV("assets/data/cave_walls.csv", "assets/images/cave_tileset.png", 16, 16, 0, 1);
 		add(_mapWalls);
 		_mapGround = new FlxTilemap();
-		_mapGround.loadMapFromCSV("assets/data/cave_ground.txt", "assets/images/cave_tileset.png", 16, 16, 0, 1);
+		_mapGround.loadMapFromCSV("assets/data/cave_ground.csv", "assets/images/cave_tileset.png", 16, 16, 0, 1);
 		add(_mapGround);
 
-		_survivor = new Survivor(200, 200, _bullets);
-		_survivor.x = FlxG.width / 2 - _survivor.width;
-		_survivor.y = FlxG.height / 2 - 16;
+		_survivor = new Survivor(cast(SURVIVOR_SPAWN_POINT.x, Int), cast(SURVIVOR_SPAWN_POINT.y, Int), _bullets);
 		playerHealth = _survivor.health;
 
 		add(_survivor);
@@ -69,9 +72,14 @@ class PlayState extends FlxState {
 		FlxG.overlap(_survivor, _enemies, onOverlap);
 		FlxG.overlap(_bullets, _enemies, onOverlap);
 		FlxG.collide(_enemies, _enemies);
-		playerHealth = _survivor.health;
+		FlxG.collide(_survivor, _mapWalls);
+		FlxG.collide(_enemies, _mapWalls);
 		checkIfWaveIsOver();
-		//FlxG.collide(_survivor, _mWalls);
+		playerHealth = _survivor.health;
+
+		if(FlxG.mouse.justPressed) {
+			FlxG.log.add(FlxG.mouse.x + " - " + FlxG.mouse.y);
+		}
 	}
 
 	function checkIfWaveIsOver() {
@@ -129,7 +137,8 @@ class PlayState extends FlxState {
 		if (Std.is(s1, Survivor))
 			s1.hurt(1);
 		if(Std.is(s1, Bullet)){
-				s2.hurt(1);
+			s1.kill();
+			s2.hurt(1);
 			if(!s2.alive){
 				_enemies_killed_in_this_wave++;
 			}

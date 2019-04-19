@@ -95,9 +95,9 @@ null
 #if !display
 #if flash
 
-@:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_data_cave_ground_txt extends null { }
-@:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_data_cave_walls_txt extends null { }
-@:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_data_level0_oel extends null { }
+@:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_data_cave_json extends null { }
+@:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_data_cave_ground_csv extends null { }
+@:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_data_cave_walls_csv extends null { }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_images_cave_tileset_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_images_dungeon_tiles_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_images_survivor_image_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }

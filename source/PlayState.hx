@@ -22,12 +22,14 @@ class PlayState extends FlxState {
 	public var currentWave = 0;
 
 	// Tilemap
-	var _map:FlxOgmoLoader;
+	/*var _map:FlxOgmoLoader;
  	var _mWalls:FlxTilemap;
- 	var _mGround:FlxTilemap;
+ 	var _mGround:FlxTilemap;*/
+	var _mapWalls:FlxTilemap;
+	var _mapGround:FlxTilemap;
 
 	override public function create():Void {
-		_map = new FlxOgmoLoader(AssetPaths.level0__oel);
+		/*_map = new FlxOgmoLoader(AssetPaths.level0__oel);
 		_mWalls = _map.loadTilemap(AssetPaths.dungeon_tiles__png, 8, 8, "walls");
 		_mWalls.follow();
 		_mWalls.setTileProperties(1, FlxObject.NONE);
@@ -35,15 +37,21 @@ class PlayState extends FlxState {
 		
 		_mGround = _map.loadTilemap(AssetPaths.dungeon_tiles__png, 8, 8, "ground");
 		//add(_mWalls);
-		//add(_mGround);
+		//add(_mGround);		
+
+		_map.loadEntities(placeEntities, "entities");*/
+
+		_mapWalls = new FlxTilemap();
+		_mapWalls.loadMapFromCSV("assets/data/cave_walls.txt", "assets/images/cave_tileset.png", 16, 16, 0, 1);
+		add(_mapWalls);
+		_mapGround = new FlxTilemap();
+		_mapGround.loadMapFromCSV("assets/data/cave_ground.txt", "assets/images/cave_tileset.png", 16, 16, 0, 1);
+		add(_mapGround);
 
 		_survivor = new Survivor(200, 200, _bullets);
 		_survivor.x = FlxG.width / 2 - _survivor.width;
 		_survivor.y = FlxG.height / 2 - 16;
 		playerHealth = _survivor.health;
-
-		_map.loadEntities(placeEntities, "entities");
-
 
 		add(_survivor);
 		add(_bullets);

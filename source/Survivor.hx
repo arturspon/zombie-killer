@@ -1,5 +1,6 @@
 package;
 
+import haxe.ds.Map;
 import flixel.math.FlxAngle;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
@@ -29,14 +30,16 @@ class Survivor extends Entity {
     public function new(x:Int, y:Int, bullets:FlxTypedGroup<Bullet>) {
         super(x, y);
         health = 10;
-        //makeGraphic(12, 12, 0xFFFFFFFF);
-        loadGraphic(AssetPaths.survivor_move_handgun__png, true, 258, 220);
-        animation.add("move", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 16, true);
-        animation.play("move");
+        
+        loadGraphic(
+            AssetPaths.survivor__png, true, 258, 220);
 
-        setGraphicSize(28, 28);
+        setGraphicSize(24, 24);
         updateHitbox();
         updateFramePixels();
+
+        animation.add("movingHandgun", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 16, true);
+        animation.play("movingHandgun");
 
         _bullets = bullets;
         giveInitialBullets();
@@ -67,12 +70,6 @@ class Survivor extends Entity {
 
     function checkInputs() {
         // Movement and combat
-        if(FlxG.mouse.justPressed) {
-            shoot();
-        }
-        if(FlxG.mouse.pressed) {
-            if(PlayState.currentInventorySelectedItem == PlayState.WEAPON_RIFLE) shoot();
-        }
         if(FlxG.keys.pressed.A && x > 0){
             x -= PLAYER_SPEED;
         }
@@ -84,6 +81,12 @@ class Survivor extends Entity {
         }
         if(FlxG.keys.pressed.S && y < FlxG.height - height){
             y += PLAYER_SPEED;
+        }
+        if(FlxG.mouse.justPressed) {
+            shoot();
+        }
+        if(FlxG.mouse.pressed) {
+            if(PlayState.currentInventorySelectedItem == PlayState.WEAPON_RIFLE) shoot();
         }
 
         // Inventory

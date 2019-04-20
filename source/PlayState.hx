@@ -1,6 +1,7 @@
 package;
 
-import flixel.FlxSprite;
+import flixel.math.FlxMath;
+import neko.Random;
 import lime.math.Vector2;
 import flixel.FlxObject;
 import flixel.FlxG;
@@ -19,6 +20,7 @@ class PlayState extends FlxState {
 	var _enemies_killed_in_this_wave:Int = 0;
 
 	public var playerHealth:Float;
+	public var playerMoney:Float;
 	public var currentWave = 0;
 
 	// Tilemap
@@ -36,6 +38,9 @@ class PlayState extends FlxState {
 	// Items	
 	public static inline var WEAPON_PISTOL = 0;
 	public static inline var WEAPON_RIFLE = 1;
+
+	// Misc
+	var _random:FlxRandom = new FlxRandom();
 
 	override public function create():Void {
 		// Spawn points
@@ -59,7 +64,7 @@ class PlayState extends FlxState {
 		add(_bullets);
 		add(_enemies);
 
-		_hud = new HUD();
+		_hud = new HUD(_survivor);
 		add(_hud);
 
 		populateWave();
@@ -77,6 +82,7 @@ class PlayState extends FlxState {
 		FlxG.collide(_enemies, _mapWalls);
 		checkIfWaveIsOver();
 		playerHealth = _survivor.health;
+		playerMoney = _survivor.money;
 	}
 
 	function checkIfWaveIsOver() {
@@ -120,6 +126,7 @@ class PlayState extends FlxState {
 			s2.hurt(1);
 			if(!s2.alive){
 				_enemies_killed_in_this_wave++;
+				_survivor.money += FlxMath.roundDecimal(_random.float(0.4, 1.2), 2);
 			}
 		}
 	}

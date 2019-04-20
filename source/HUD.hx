@@ -1,6 +1,6 @@
 package;
 
-import flixel.group.FlxGroup;
+import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
 import flixel.FlxG;
@@ -9,7 +9,10 @@ import flixel.text.FlxText;
 using flixel.util.FlxSpriteUtil;
 
 class HUD extends FlxTypedGroup<FlxSprite> {
+    var _survivor:Survivor;
+
     var _health:FlxText;
+    var _money:FlxText;
     var _wave:FlxText;
 
     var lineStyle:LineStyle = { color: FlxColor.GRAY, thickness: 1 };
@@ -26,11 +29,21 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     // Item store
     var _itemStore:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
     var _isItemStoreVisible = false;
+    var _storePriceMap = [
+        PlayState.WEAPON_RIFLE => 10.0
+    ];
+    var _itemSpriteMap = [
+        PlayState.WEAPON_PISTOL => AssetPaths.Tokarev_TT_33__png,
+        PlayState.WEAPON_RIFLE => AssetPaths.StG_44__png
+    ];
     
-    public function new(){
+    public function new(survivor:Survivor){
         super();
 
+        _survivor = survivor;
+
         _health = new FlxText(5, 5, 0, "Health: ", 16);
+        _money = new FlxText(5, _health.y + _health.height + 8, 0, "$0", 16);
         _wave = new FlxText(0, 5, 0, "Wave A", 16);
         _wave.x = (FlxG.width - _wave.width) - 5;
 
@@ -40,13 +53,14 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         updateInventory();
 
         add(_health);
-        add(_wave);    
-
+        add(_money);
+        add(_wave);
     }
 
     override public function update(elapsed:Float):Void {
         var s:PlayState = cast FlxG.state;
         _health.text = "Health: " + s.playerHealth;
+        _money.text = "$" + s.playerMoney;
         _wave.text = "Wave " + (s.currentWave + 1);
         
         if(FlxG.keys.justPressed.B) drawStore();
@@ -75,20 +89,16 @@ class HUD extends FlxTypedGroup<FlxSprite> {
             if(_inventoryRenderedItems.indexOf(item) < 0) {
                 var xPositionToRenderItem = FlxG.width / 2 - inventoryBarTotalWidth / 2 + inventorySpaceSquareSize * _inventoryRenderedItems.length;
 
+                var s = new FlxSprite(xPositionToRenderItem, 4);
+                s.loadGraphic(_itemSpriteMap.get(item), false);
 
-                switch(item) {
-                    case PlayState.WEAPON_PISTOL:
-                        var s = new FlxSprite(xPositionToRenderItem, 4);
-                        s.loadGraphic(AssetPaths.Tokarev_TT_33__png, false);
-
-                        // Resizing the sprite but keeping it's aspect ratio
-                        var aspectRatio = s.width / s.height;
-                        var adjustedHeight = cast(inventorySpaceSquareSize / aspectRatio, Int);
-                        
-                        s.setGraphicSize(inventorySpaceSquareSize - _inventoryItemSpritePadding, adjustedHeight - _inventoryItemSpritePadding);
-                        add(s);
-                    //case PlayState.WEAPON_RIFLE:
-                }
+                // Resizing the sprite but keeping it's aspect ratio
+                var aspectRatio = s.width / s.height;
+                var adjustedHeight = cast(inventorySpaceSquareSize / aspectRatio, Int);
+                
+                s.setGraphicSize(inventorySpaceSquareSize - _inventoryItemSpritePadding, adjustedHeight - _inventoryItemSpritePadding);
+                s.angle = -20;
+                add(s);
             }
         }
 
@@ -120,23 +130,70 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
         var itemStoreWidth = FlxG.width - 128;
         var itemStoreHeight = FlxG.height - 128;
+        var itemStoreStartX = 64;
+        var itemStoreStartY = 64;
+        var itemStoreSpaceSize = 128;
+        var itemStoreSpacePadding = 24;
 
         var squareContainer = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT, true);
-        squareContainer.drawRect(64, 64, itemStoreWidth, itemStoreHeight, 0xF03d3d3d, lineStyle);
+        squareContainer.drawRect(itemStoreStartX, itemStoreStartY, itemStoreWidth, itemStoreHeight, 0xF03d3d3d, lineStyle);
 
         var storeTitle = new FlxText(5, 5, 0, "Item store", 16);
         storeTitle.x = itemStoreWidth / 2;
         storeTitle.y = 72;
+
         
         _itemStore.add(squareContainer);
         _itemStore.add(storeTitle);
+
+        var aux:Int = 0;
+        for (itemKey in _storePriceMap.keys()) {
+            var itemX = itemStoreStartX + aux*itemStoreSpaceSize + itemStoreSpacePadding;
+            var itemY = itemStoreStartY + storeTitle.height + itemStoreSpacePadding;
+
+            var itemSpace = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT, true);
+            itemSpace.drawRect(itemX, itemY, itemStoreSpaceSize, itemStoreSpaceSize, FlxColor.TRANSPARENT, lineStyle);
+            _itemStore.add(itemSpace);
+
+            var itemToSell = new FlxSprite();
+            itemToSell.loadGraphic(_itemSpriteMap.get(itemKey), false);
+            var aspectRatio = itemToSell.width / itemToSell.height;
+            var adjustedHeight = cast(itemStoreSpaceSize / aspectRatio, Int);                        
+            itemToSell.setGraphicSize(itemStoreSpaceSize - itemStoreSpacePadding, adjustedHeight - itemStoreSpacePadding);
+            itemToSell.angle = -24;
+            itemToSell.x = itemStoreSpaceSize / 2 + itemToSell.width - 8;
+            itemToSell.y = itemY + 32;
+            _itemStore.add(itemToSell);
+
+            var btnBuy = new FlxButton(0, 0, "", function(){
+                buyItem(itemKey);
+            });
+            btnBuy.text = "Buy!";
+            btnBuy.x = itemStoreSpaceSize / 2 + btnBuy.width / 2 + 10;
+            btnBuy.y = itemToSell.y + 64;
+            _itemStore.add(btnBuy);
+
+            var priceText = new FlxText();
+            priceText.text = "$" + Std.string(_storePriceMap.get(itemKey));
+            priceText.x = itemX + itemStoreSpaceSize / 2 - priceText.width / 2;
+            priceText.y = btnBuy.y - 16;
+            _itemStore.add(priceText);
+
+            aux++;
+        }
 
         _itemStore.forEach(function(s:FlxSprite) {
             add(s);
         }, false);
         
         _isItemStoreVisible = true;
+    }
 
-        //add(_itemStore);
+    function buyItem(itemId:Int) {
+        var itemPrice = _storePriceMap.get(itemId);
+        if((_survivor.money - itemPrice) >= 0) {
+            _survivor.money -= itemPrice;
+            PlayState.inventoryItemsList.push(itemId);
+        }
     }
 }

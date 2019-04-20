@@ -16,6 +16,8 @@ class Survivor extends Entity {
         PlayState.WEAPON_PISTOL => 1 / 8,
         PlayState.WEAPON_RIFLE => 1 / 11.1
     ];
+
+    public var money:Float = 9.0;
     
 	 // Sound effects
 	 var _sndPistolShot:FlxSound;

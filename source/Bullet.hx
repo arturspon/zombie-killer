@@ -3,9 +3,14 @@ package;
 import flixel.FlxSprite;
 
 class Bullet extends FlxSprite {
+    var bulletSize = 4;
+
     public function new() {
         super();
-        makeGraphic(5, 5, 0xFFFFe900);
+        loadGraphic(AssetPaths.bullet__png, false, 32, 32);
+        setGraphicSize(bulletSize);
+        updateHitbox();
+        updateFramePixels();
     }
 
     override public function update(elapsed:Float):Void {

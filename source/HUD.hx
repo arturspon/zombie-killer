@@ -70,14 +70,14 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
     function drawInventorySpaces() {
         for(i in 0...inventorySpaces) {
-            var inventorySpaceX = FlxG.width / 2 - inventoryBarTotalWidth / 2 + i*inventorySpaceSquareSize;
+            var inventorySpaceX = (FlxG.width / 2 - inventoryBarTotalWidth / 2) + i*inventorySpaceSquareSize;
             var inventorySpaceY = 4;
 
             var _inventoryItemSpace = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT, true);
             _inventoryItemSpace.drawRect(inventorySpaceX, inventorySpaceY, inventorySpaceSquareSize, inventorySpaceSquareSize, FlxColor.TRANSPARENT, lineStyle);
             add(_inventoryItemSpace);
 
-            var _inventoryNumberText = new FlxText(inventorySpaceX, inventorySpaceSquareSize - 10, 0, Std.string(i + 1), 8);
+            var _inventoryNumberText = new FlxText(inventorySpaceX + inventorySpaceSquareSize - 12, inventorySpaceSquareSize - 10, 0, Std.string(i + 1), 8);
             add(_inventoryNumberText);
             _inventoryNumberTextList.push(_inventoryNumberText); // Used to change color when item is selected
         }
@@ -87,18 +87,18 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         // Draw items in inventory bar
         for(item in PlayState.inventoryItemsList) {
             if(_inventoryRenderedItems.indexOf(item) < 0) {
-                var xPositionToRenderItem = FlxG.width / 2 - inventoryBarTotalWidth / 2 + inventorySpaceSquareSize * _inventoryRenderedItems.length;
+                var xPositionToRenderItem = (FlxG.width / 2 - inventoryBarTotalWidth / 2) + inventorySpaceSquareSize * _inventoryRenderedItems.length;
 
-                var s = new FlxSprite(xPositionToRenderItem, 4);
+                var s = new FlxSprite(xPositionToRenderItem, inventorySpaceSquareSize / 2 - 4);
                 s.loadGraphic(_itemSpriteMap.get(item), false);
-
-                // Resizing the sprite but keeping it's aspect ratio
-                var aspectRatio = s.width / s.height;
-                var adjustedHeight = cast(inventorySpaceSquareSize / aspectRatio, Int);
                 
-                s.setGraphicSize(inventorySpaceSquareSize - _inventoryItemSpritePadding, adjustedHeight - _inventoryItemSpritePadding);
-                s.angle = -20;
+                s.setGraphicSize(32);
+                s.updateHitbox();
+                s.updateSpriteGraphic();
+                s.angle = -32;
+                s.x = ((FlxG.width / 2 - inventoryBarTotalWidth / 2) + inventorySpaceSquareSize * _inventoryRenderedItems.length);
                 add(s);
+                _inventoryRenderedItems.push(item);
             }
         }
 
@@ -156,10 +156,8 @@ class HUD extends FlxTypedGroup<FlxSprite> {
             _itemStore.add(itemSpace);
 
             var itemToSell = new FlxSprite();
-            itemToSell.loadGraphic(_itemSpriteMap.get(itemKey), false);
-            var aspectRatio = itemToSell.width / itemToSell.height;
-            var adjustedHeight = cast(itemStoreSpaceSize / aspectRatio, Int);                        
-            itemToSell.setGraphicSize(itemStoreSpaceSize - itemStoreSpacePadding, adjustedHeight - itemStoreSpacePadding);
+            itemToSell.loadGraphic(_itemSpriteMap.get(itemKey), false);                       
+            itemToSell.setGraphicSize(itemStoreSpaceSize - itemStoreSpacePadding);
             itemToSell.angle = -24;
             itemToSell.x = itemStoreSpaceSize / 2 + itemToSell.width - 8;
             itemToSell.y = itemY + 32;
@@ -194,6 +192,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         if((_survivor.money - itemPrice) >= 0) {
             _survivor.money -= itemPrice;
             PlayState.inventoryItemsList.push(itemId);
+            updateInventory();
         }
     }
 }

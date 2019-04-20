@@ -13,11 +13,11 @@ class Survivor extends Entity {
     static var PLAYER_SPEED = 1.5;
     static var BULLET_SPEED = 2048;
     static var FIRE_RATE_MAP = [
-        PlayState.WEAPON_PISTOL => 1 / 8,
+        PlayState.WEAPON_PISTOL => 1 / 5,
         PlayState.WEAPON_RIFLE => 1 / 11.1
     ];
 
-    public var money:Float = 9.0;
+    public var money:Float = 100.0;
     
 	 // Sound effects
 	 var _sndPistolShot:FlxSound;
@@ -59,6 +59,9 @@ class Survivor extends Entity {
         if(FlxG.mouse.justPressed) {
             shoot();
         }
+        if(FlxG.mouse.pressed) {
+            if(PlayState.currentInventorySelectedItem == PlayState.WEAPON_RIFLE) shoot();
+        }
         if(FlxG.keys.pressed.A && x > 0){
             x -= PLAYER_SPEED;
         }
@@ -79,24 +82,25 @@ class Survivor extends Entity {
     function shoot() {
         if (_shootTimer.active) return;
 
-        if(PlayState.currentInventorySelectedItem == PlayState.WEAPON_PISTOL ||
-            PlayState.currentInventorySelectedItem == PlayState.WEAPON_RIFLE) {
-                _shootTimer.start(FIRE_RATE_MAP.get(PlayState.currentInventorySelectedItem));
+        if(PlayState.inventoryItemsList.indexOf(PlayState.currentInventorySelectedItem) >= 0) {
+            if(PlayState.currentInventorySelectedItem == PlayState.WEAPON_PISTOL ||
+                PlayState.currentInventorySelectedItem == PlayState.WEAPON_RIFLE) {
+                    _shootTimer.start(FIRE_RATE_MAP.get(PlayState.currentInventorySelectedItem));
 
-                _velocity.x = FlxG.mouse.x - x;
-                _velocity.y = FlxG.mouse.y - y;
-                _velocity.normalize();
-                _velocity.scale(BULLET_SPEED);
-                
-                var bullet = _bullets.getFirstAvailable();
-                bullet.reset(x + width / 2, y - height / 2);
-                bullet.angularVelocity = 1024;
-                bullet.velocity.x = _velocity.x;
-                bullet.velocity.y = _velocity.y;
+                    _velocity.x = FlxG.mouse.x - x;
+                    _velocity.y = FlxG.mouse.y - y;
+                    _velocity.normalize();
+                    _velocity.scale(BULLET_SPEED);
+                    
+                    var bullet = _bullets.getFirstAvailable();
+                    bullet.reset(x + width / 2, y - height / 2);
+                    bullet.angularVelocity = 1024;
+                    bullet.velocity.x = _velocity.x;
+                    bullet.velocity.y = _velocity.y;
 
-                _sndPistolShot.play(true);                
-            }
-
+                    _sndPistolShot.play(true);                
+                }
+        }
     }
     
     function updateInventorySelectedItem() {

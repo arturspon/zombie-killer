@@ -37,10 +37,10 @@ class PlayState extends FlxState {
 		3 => 0.5,
 		4 => 0.1
 	];
-	static var SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP:Map<Int, Int> = [
+	static var SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP:Map<Int, Int> = [ // If the requested key is null, the number of enemies vary by wave.
 		4 => 25
 	];
-	static var SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP:Map<Int, Int> = [ // If null, them time is 5 secons.
+	static var SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP:Map<Int, Int> = [ // If the requested key is null, them time is 5 seconds.
 		4 => 15
 	];
 	public var secondsRemainingUntilNextWave:Int = 0;

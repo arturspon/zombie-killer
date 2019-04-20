@@ -1,5 +1,6 @@
 package;
 
+import flixel.math.FlxAngle;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
 import flixel.math.FlxVector;
@@ -28,9 +29,14 @@ class Survivor extends Entity {
     public function new(x:Int, y:Int, bullets:FlxTypedGroup<Bullet>) {
         super(x, y);
         health = 10;
-        makeGraphic(12, 12, 0xFFFFFFFF);
+        //makeGraphic(12, 12, 0xFFFFFFFF);
+        loadGraphic(AssetPaths.survivor_move_handgun__png, true, 258, 220);
+        animation.add("move", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 16, true);
+        animation.play("move");
 
-        setSize(12, 12);
+        setGraphicSize(28, 28);
+        updateHitbox();
+        updateFramePixels();
 
         _bullets = bullets;
         giveInitialBullets();
@@ -44,6 +50,7 @@ class Survivor extends Entity {
     override public function update(elapsed:Float):Void	{
 		super.update(elapsed);
         checkInputs();
+        lookAtMousePointer();
 	}
 
     function giveInitialBullets() {
@@ -52,6 +59,10 @@ class Survivor extends Entity {
             s.kill();
             _bullets.add(s);
         }
+    }
+
+    function lookAtMousePointer() {
+        angle = FlxAngle.angleBetweenMouse(this, true);
     }
 
     function checkInputs() {
@@ -96,7 +107,7 @@ class Survivor extends Entity {
                     _velocity.scale(BULLET_SPEED);
                     
                     var bullet = _bullets.getFirstAvailable();
-                    bullet.reset(x + width / 2, y - height / 2);
+                    bullet.reset(x, y);
                     //bullet.angularVelocity = 1024;
                     bullet.velocity.x = _velocity.x;
                     bullet.velocity.y = _velocity.y;

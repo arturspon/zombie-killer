@@ -15,6 +15,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     var _ammoForCurrentWeapon:FlxText;
     var _money:FlxText;
     var _wave:FlxText;
+    var _timeUntilNextWave:FlxText;
 
     var lineStyle:LineStyle = { color: FlxColor.GRAY, thickness: 1 };
     var drawStyle:DrawStyle = { smoothing: true };
@@ -49,8 +50,14 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         _health = new FlxText(5, 5, 0, "Health: ", 16);
         _ammoForCurrentWeapon = new FlxText(5, _health.y + _health.height + 8, 0, "Ammo: ", 16);
         _money = new FlxText(5, _ammoForCurrentWeapon.y + _ammoForCurrentWeapon.height + 8, 0, "$0", 16);
+
         _wave = new FlxText(0, 5, 0, "Wave A", 16);
         _wave.x = (FlxG.width - _wave.width) - 5;
+
+        _timeUntilNextWave = new FlxText(0, 0, 0, "Next wave in ", 16);
+        _timeUntilNextWave.x = FlxG.width / 2 - _timeUntilNextWave.width / 2;
+        _timeUntilNextWave.y = (FlxG.height - _timeUntilNextWave.height) - 8;
+        _timeUntilNextWave.kill();
 
         // Player's inventory
         inventoryBarTotalWidth = inventorySpaceSquareSize * inventorySpaces;
@@ -61,6 +68,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         add(_ammoForCurrentWeapon);
         add(_money);
         add(_wave);
+        add(_timeUntilNextWave);
     }
 
     override public function update(elapsed:Float):Void {
@@ -71,10 +79,21 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
         var ammoForCurrentWeapon = _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem) == null ? 0 : _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem);
         _ammoForCurrentWeapon.text = "Ammo: " + ammoForCurrentWeapon;
+
+        drawTimeUntilNextWave(s);
         
         if(FlxG.keys.justPressed.B) drawStore();
 
         super.update(elapsed);
+    }
+
+    function drawTimeUntilNextWave(s:PlayState) {
+        if(s.secondsRemainingUntilNextWave > 0) {
+            _timeUntilNextWave.revive();
+            _timeUntilNextWave.text = "Next wave in " + s.secondsRemainingUntilNextWave;
+        } else {
+            _timeUntilNextWave.kill();
+        }
     }
 
     function drawInventorySpaces() {

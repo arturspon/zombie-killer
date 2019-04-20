@@ -35,11 +35,15 @@ class PlayState extends FlxState {
 		1 => 0.9,
 		2 => 0.7,
 		3 => 0.5,
-		4 => 0.01
+		4 => 0.1
 	];
 	static var SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP:Map<Int, Int> = [
 		4 => 50
 	];
+	static var SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP:Map<Int, Int> = [ // If null, them time is 5 secons.
+		4 => 15
+	];
+	public var secondsRemainingUntilNextWave:Int = 0;
 
 	// Player's inventory
 	public static var currentInventorySelectedItem:Int = 0;
@@ -78,7 +82,7 @@ class PlayState extends FlxState {
 		add(_hud);
 
 		populateWave();
-		enemySpawner();
+		enemySpawner(null);
 
 		super.create();
 	}
@@ -100,7 +104,13 @@ class PlayState extends FlxState {
 			_enemies_killed_in_this_wave = 0;
 			currentWave++;
 			populateWave();
-			enemySpawner();
+
+			var timeUntilNextWave = SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP.get(currentWave) == null ? 5 : SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP.get(currentWave);
+			secondsRemainingUntilNextWave = timeUntilNextWave;
+			new FlxTimer().start(1, 
+				function(deltaTime:FlxTimer){secondsRemainingUntilNextWave--;}, 
+				timeUntilNextWave);
+			new FlxTimer().start(timeUntilNextWave, enemySpawner, 1);
 		}
 	}
 
@@ -114,7 +124,7 @@ class PlayState extends FlxState {
 		}
 	}
 	
-	function enemySpawner() {
+	function enemySpawner(deltaTime:FlxTimer) {
 		var timer:FlxTimer = new FlxTimer();
 		var spawnFrequency = SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave) == null ? 1 : SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave);
 		timer.start(spawnFrequency, spawnEnemy, _enemies_in_this_wave);
@@ -137,7 +147,7 @@ class PlayState extends FlxState {
 			s2.hurt(1);
 			if(!s2.alive){
 				_enemies_killed_in_this_wave++;
-				_survivor.money += FlxMath.roundDecimal(_random.float(0.4, 1.2), 2);
+				_survivor.money += FlxMath.roundDecimal(_random.float(0.2, 1.2), 2);
 			}
 		}
 	}

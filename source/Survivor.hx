@@ -1,6 +1,5 @@
 package;
 
-import haxe.ds.HashMap;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
 import flixel.math.FlxVector;

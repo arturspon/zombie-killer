@@ -53,7 +53,7 @@ class Enemy extends Entity {
         } else if (wave == 4) { 
             speed = random.float(100, 150);
         } else {
-            speed = random.float(100, 400);
+            speed = random.float(100, 350);
         }
         
         ENEMY_SPEED = speed;

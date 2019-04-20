@@ -1,5 +1,6 @@
 package;
 
+import haxe.ds.Map;
 import flixel.math.FlxMath;
 import lime.math.Vector2;
 import flixel.FlxObject;
@@ -29,6 +30,16 @@ class PlayState extends FlxState {
 	// Spawn points
 	static var SURVIVOR_SPAWN_POINT:Vector2 = new Vector2(317, 89);
 	static var ENEMIES_SPAWN_POINT_LIST:Array<Vector2>;
+	static var SPAWN_FREQUENCY_BY_WAVE_MAP:Map<Int, Float> = [
+		0 => 1,
+		1 => 0.9,
+		2 => 0.7,
+		3 => 0.5,
+		4 => 0.01
+	];
+	static var SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP:Map<Int, Int> = [
+		4 => 50
+	];
 
 	// Player's inventory
 	public static var currentInventorySelectedItem:Int = 0;
@@ -95,7 +106,7 @@ class PlayState extends FlxState {
 
 	function populateWave() {
 		_enemies = new FlxTypedGroup<Enemy>();
-		_enemies_in_this_wave = currentWave * 2 + 5;
+		_enemies_in_this_wave = SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP.get(currentWave) == null ? (currentWave * 2 + 5) : SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP.get(currentWave);
 		for(i in 0..._enemies_in_this_wave){
 			var enemy = new Enemy(currentWave, _survivor);
 			enemy.kill();
@@ -105,7 +116,8 @@ class PlayState extends FlxState {
 	
 	function enemySpawner() {
 		var timer:FlxTimer = new FlxTimer();
-		timer.start(1, spawnEnemy, _enemies_in_this_wave);
+		var spawnFrequency = SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave) == null ? 1 : SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave);
+		timer.start(spawnFrequency, spawnEnemy, _enemies_in_this_wave);
 	}
 
 	function spawnEnemy(deltaTime:FlxTimer) {

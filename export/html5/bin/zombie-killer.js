@@ -894,9 +894,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","25");
+		_this.setReserved("build","26");
 	} else {
-		_this.h["build"] = "25";
+		_this.h["build"] = "26";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -8431,6 +8431,9 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		var timer = new flixel_util_FlxTimer();
 		var spawnFrequency = PlayState.SPAWN_FREQUENCY_BY_WAVE_MAP.h[this.currentWave] == null ? 1 : PlayState.SPAWN_FREQUENCY_BY_WAVE_MAP.h[this.currentWave];
 		timer.start(spawnFrequency,$bind(this,this.spawnEnemy),this._enemies_in_this_wave);
+		if(this.currentWave == 5) {
+			flixel_FlxG.cameras.shake(0.035,1.5);
+		}
 	}
 	,spawnEnemy: function(deltaTime) {
 		var random = new flixel_math_FlxRandom();

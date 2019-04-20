@@ -38,7 +38,7 @@ class PlayState extends FlxState {
 		4 => 0.1
 	];
 	static var SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP:Map<Int, Int> = [
-		4 => 50
+		4 => 25
 	];
 	static var SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP:Map<Int, Int> = [ // If null, them time is 5 secons.
 		4 => 15
@@ -128,6 +128,8 @@ class PlayState extends FlxState {
 		var timer:FlxTimer = new FlxTimer();
 		var spawnFrequency = SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave) == null ? 1 : SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave);
 		timer.start(spawnFrequency, spawnEnemy, _enemies_in_this_wave);
+
+		if(currentWave == 4) FlxG.cameras.shake(0.015, 1.5);
 	}
 
 	function spawnEnemy(deltaTime:FlxTimer) {

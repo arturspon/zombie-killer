@@ -33,7 +33,7 @@ class PlayState extends FlxState {
 	public static var currentInventorySelectedItem:Int = 0;
 	public static var inventoryItemsList:Array<Int>;
 
-	// Items
+	// Items	
 	public static inline var WEAPON_PISTOL = 0;
 	public static inline var WEAPON_RIFLE = 1;
 

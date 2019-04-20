@@ -1,5 +1,6 @@
 package;
 
+import flixel.group.FlxGroup;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
 import flixel.FlxG;
@@ -21,6 +22,10 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     var _inventoryItemSpritePadding = 8;
     var _inventoryRenderedItems:Array<Int> = new Array<Int>(); // Items that have already been rendered to HUD
     var _inventoryNumberTextList:Array<FlxText> = new Array<FlxText>();
+
+    // Item store
+    var _itemStore:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
+    var _isItemStoreVisible = false;
     
     public function new(){
         super();
@@ -43,6 +48,8 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         var s:PlayState = cast FlxG.state;
         _health.text = "Health: " + s.playerHealth;
         _wave.text = "Wave " + (s.currentWave + 1);
+        
+        if(FlxG.keys.justPressed.B) drawStore();
 
         super.update(elapsed);
     }
@@ -92,5 +99,44 @@ class HUD extends FlxTypedGroup<FlxSprite> {
                 _inventoryNumberTextList[i].color = 0xffbcbcbc;
             }
         }
+    }
+
+    function drawStore() {
+        if(_isItemStoreVisible) {
+            _itemStore.forEach(function(s:FlxSprite) {
+                remove(s);
+            }, false);
+            _isItemStoreVisible = false;
+            return;
+        }
+
+        if(_itemStore.length > 0) {
+            _itemStore.forEach(function(s:FlxSprite) {
+                add(s);
+            }, false);
+            _isItemStoreVisible = true;
+            return;
+        }
+
+        var itemStoreWidth = FlxG.width - 128;
+        var itemStoreHeight = FlxG.height - 128;
+
+        var squareContainer = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT, true);
+        squareContainer.drawRect(64, 64, itemStoreWidth, itemStoreHeight, 0xF03d3d3d, lineStyle);
+
+        var storeTitle = new FlxText(5, 5, 0, "Item store", 16);
+        storeTitle.x = itemStoreWidth / 2;
+        storeTitle.y = 72;
+        
+        _itemStore.add(squareContainer);
+        _itemStore.add(storeTitle);
+
+        _itemStore.forEach(function(s:FlxSprite) {
+            add(s);
+        }, false);
+        
+        _isItemStoreVisible = true;
+
+        //add(_itemStore);
     }
 }

@@ -12,7 +12,10 @@ class Survivor extends Entity {
     var _shootTimer = new FlxTimer();
     static var PLAYER_SPEED = 1.5;
     static var BULLET_SPEED = 2048;
-    static var FIRE_RATE:Float = 1 / 8;
+    static var FIRE_RATE_MAP = [
+        PlayState.WEAPON_PISTOL => 1 / 8,
+        PlayState.WEAPON_RIFLE => 1 / 11.1
+    ];
     
 	 // Sound effects
 	 var _sndPistolShot:FlxSound;
@@ -73,22 +76,25 @@ class Survivor extends Entity {
 
     function shoot() {
         if (_shootTimer.active) return;
-        _shootTimer.start(FIRE_RATE);
 
-        var bullet = _bullets.getFirstAvailable();
+        if(PlayState.currentInventorySelectedItem == PlayState.WEAPON_PISTOL ||
+            PlayState.currentInventorySelectedItem == PlayState.WEAPON_RIFLE) {
+                _shootTimer.start(FIRE_RATE_MAP.get(PlayState.currentInventorySelectedItem));
 
-        _velocity.x = FlxG.mouse.x - x;
-        _velocity.y = FlxG.mouse.y - y;
-        _velocity.normalize();
-        _velocity.scale(BULLET_SPEED);
-        
-        bullet.reset(x + width / 2, y - height / 2);
-        bullet.angularVelocity = 1024;
-        bullet.velocity.x = _velocity.x;
-        bullet.velocity.y = _velocity.y;
+                _velocity.x = FlxG.mouse.x - x;
+                _velocity.y = FlxG.mouse.y - y;
+                _velocity.normalize();
+                _velocity.scale(BULLET_SPEED);
+                
+                var bullet = _bullets.getFirstAvailable();
+                bullet.reset(x + width / 2, y - height / 2);
+                bullet.angularVelocity = 1024;
+                bullet.velocity.x = _velocity.x;
+                bullet.velocity.y = _velocity.y;
 
-        _sndPistolShot.play(true);
-        //_sndPistolShot.loadEmbedded(AssetPaths.pistol_shot__wav);
+                _sndPistolShot.play(true);                
+            }
+
     }
     
     function updateInventorySelectedItem() {

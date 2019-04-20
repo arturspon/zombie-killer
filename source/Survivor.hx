@@ -1,5 +1,6 @@
 package;
 
+import haxe.ds.HashMap;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
 import flixel.math.FlxVector;
@@ -16,8 +17,11 @@ class Survivor extends Entity {
         PlayState.WEAPON_PISTOL => 1 / 5,
         PlayState.WEAPON_RIFLE => 1 / 11.1
     ];
+    public var _bulletsMap:Map<Int, Int> = [
+        PlayState.WEAPON_PISTOL => 100
+    ];
 
-    public var money:Float = 100.0;
+    public var money:Float = 200.0;
     
 	 // Sound effects
 	 var _sndPistolShot:FlxSound;
@@ -26,9 +30,6 @@ class Survivor extends Entity {
         super(x, y);
         health = 10;
         makeGraphic(12, 12, 0xFFFFFFFF);
-        /*loadGraphic(AssetPaths.kkkk__png, true, 258, 220);
-        animation.add("move", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 15, true);
-        animation.play("move");*/
 
         setSize(12, 12);
 
@@ -47,7 +48,7 @@ class Survivor extends Entity {
 	}
 
     function giveInitialBullets() {
-        for(i in 0...200){
+        for(i in 0...100){
             var s = new Bullet();
             s.kill();
             _bullets.add(s);
@@ -85,6 +86,9 @@ class Survivor extends Entity {
         if(PlayState.inventoryItemsList.indexOf(PlayState.currentInventorySelectedItem) >= 0) {
             if(PlayState.currentInventorySelectedItem == PlayState.WEAPON_PISTOL ||
                 PlayState.currentInventorySelectedItem == PlayState.WEAPON_RIFLE) {
+                    if(_bulletsMap.get(PlayState.currentInventorySelectedItem) <= 0) return;
+                    _bulletsMap.set(PlayState.currentInventorySelectedItem, _bulletsMap.get(PlayState.currentInventorySelectedItem)-1);
+
                     _shootTimer.start(FIRE_RATE_MAP.get(PlayState.currentInventorySelectedItem));
 
                     _velocity.x = FlxG.mouse.x - x;

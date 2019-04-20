@@ -12,6 +12,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     var _survivor:Survivor;
 
     var _health:FlxText;
+    var _ammoForCurrentWeapon:FlxText;
     var _money:FlxText;
     var _wave:FlxText;
 
@@ -36,6 +37,9 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         PlayState.WEAPON_PISTOL => AssetPaths.Tokarev_TT_33__png,
         PlayState.WEAPON_RIFLE => AssetPaths.StG_44__png
     ];
+    var _itemQtdToBuyMap = [ // Bullets, if the item is a weapon.
+        PlayState.WEAPON_RIFLE => 100
+    ];
     
     public function new(survivor:Survivor){
         super();
@@ -43,7 +47,8 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         _survivor = survivor;
 
         _health = new FlxText(5, 5, 0, "Health: ", 16);
-        _money = new FlxText(5, _health.y + _health.height + 8, 0, "$0", 16);
+        _ammoForCurrentWeapon = new FlxText(5, _health.y + _health.height + 8, 0, "Ammo: ", 16);
+        _money = new FlxText(5, _ammoForCurrentWeapon.y + _ammoForCurrentWeapon.height + 8, 0, "$0", 16);
         _wave = new FlxText(0, 5, 0, "Wave A", 16);
         _wave.x = (FlxG.width - _wave.width) - 5;
 
@@ -53,6 +58,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         updateInventory();
 
         add(_health);
+        add(_ammoForCurrentWeapon);
         add(_money);
         add(_wave);
     }
@@ -62,6 +68,9 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         _health.text = "Health: " + s.playerHealth;
         _money.text = "$" + s.playerMoney;
         _wave.text = "Wave " + (s.currentWave + 1);
+
+        var ammoForCurrentWeapon = _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem) == null ? 0 : _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem);
+        _ammoForCurrentWeapon.text = "Ammo: " + ammoForCurrentWeapon;
         
         if(FlxG.keys.justPressed.B) drawStore();
 
@@ -192,6 +201,10 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         if((_survivor.money - itemPrice) >= 0) {
             _survivor.money -= itemPrice;
             PlayState.inventoryItemsList.push(itemId);
+
+            var qtdToBuy =  _survivor._bulletsMap.get(itemId) == null ? _itemQtdToBuyMap.get(itemId) : (_itemQtdToBuyMap.get(itemId) + _survivor._bulletsMap.get(itemId));
+            _survivor._bulletsMap.set(itemId, qtdToBuy);
+
             updateInventory();
         }
     }

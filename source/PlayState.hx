@@ -1,7 +1,6 @@
 package;
 
 import flixel.math.FlxMath;
-import neko.Random;
 import lime.math.Vector2;
 import flixel.FlxObject;
 import flixel.FlxG;
@@ -35,7 +34,7 @@ class PlayState extends FlxState {
 	public static var currentInventorySelectedItem:Int = 0;
 	public static var inventoryItemsList:Array<Int>;
 
-	// Items	
+	// WEAPONS	
 	public static inline var WEAPON_PISTOL = 0;
 	public static inline var WEAPON_RIFLE = 1;
 

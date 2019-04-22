@@ -1,5 +1,6 @@
 package;
 
+import flixel.math.FlxMath;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
@@ -74,8 +75,10 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     override public function update(elapsed:Float):Void {
         var s:PlayState = cast FlxG.state;
         _health.text = "Health: " + s.playerHealth;
-        _money.text = "$" + s.playerMoney;
         _wave.text = "Wave " + (s.currentWave + 1);
+
+        var playerMoneyRounded = FlxMath.roundDecimal(s.playerMoney, 2);
+        _money.text = "$" + playerMoneyRounded;
 
         var ammoForCurrentWeapon = _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem) == null ? 0 : _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem);
         _ammoForCurrentWeapon.text = "Ammo: " + ammoForCurrentWeapon;

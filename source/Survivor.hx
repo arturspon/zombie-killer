@@ -1,6 +1,6 @@
 package;
 
-import haxe.ds.Map;
+import haxe.ds.HashMap;
 import flixel.math.FlxAngle;
 import flixel.FlxG;
 import flixel.group.FlxGroup;

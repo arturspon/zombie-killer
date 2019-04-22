@@ -1,6 +1,6 @@
 package;
 
-import haxe.ds.Map;
+import haxe.ds.HashMap;
 import flixel.math.FlxMath;
 import lime.math.Vector2;
 import flixel.FlxObject;

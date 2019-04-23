@@ -177,20 +177,28 @@ class PlayState extends FlxState {
 	function findPathAndChasePlayer(enemy:Enemy):Void {
 		updatePlayerMidPoint(enemy);
 
-		var pathPoints:Array<FlxPoint> = _mapWalls.findPath(
-			FlxPoint.get(enemy.x, enemy.y),
-			FlxPoint.get(_survivor.x, _survivor.y));
+		if(!_mapWalls.ray(enemy.getMidpoint(), _survivor.getMidpoint())) {
+			enemy.stopChasingPlayer();
 
-		if(enemy.path.active && pathPoints != null) {
-			enemy.path.addPoint(pathPoints[pathPoints.length-1]);
-			return;
-		}
-		
-		// Tell unit to follow path
-		if (pathPoints != null && enemy.isOnScreen()) {
-			enemy.path.start(pathPoints, 50, FlxPath.FORWARD, true);
-			//_survivor.path.start(pathPoints);
-		}
+			if(enemy.path == null) enemy.path = new FlxPath();
 
+			var pathPoints:Array<FlxPoint> = _mapWalls.findPath(
+				FlxPoint.get(enemy.x, enemy.y),
+				FlxPoint.get(_survivor.x, _survivor.y));
+
+			if(enemy.path.active && pathPoints != null &&
+				(_lastPlayerPos.x != _survivor.x || _lastPlayerPos.y != _survivor.y)) {
+				enemy.path.addPoint(pathPoints[pathPoints.length-1]);
+				return;
+			}
+			
+			// Tell unit to follow path
+			if (pathPoints != null && enemy.isOnScreen()) {
+				enemy.path.start(pathPoints, 50, FlxPath.FORWARD, true);
+				//_survivor.path.start(pathPoints);
+			}
+		} else {
+			enemy.chasePlayerM();
+		}
 	}
 }

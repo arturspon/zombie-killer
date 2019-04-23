@@ -19,7 +19,7 @@ class Survivor extends Entity {
         PlayState.WEAPON_RIFLE => 1 / 11.1
     ];
     public var _bulletsMap:Map<Int, Int> = [
-        PlayState.WEAPON_PISTOL => 100
+        PlayState.WEAPON_PISTOL => 30
     ];
 
     public var money:Float = 200.0;

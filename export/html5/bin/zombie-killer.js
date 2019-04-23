@@ -895,9 +895,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","30");
+		_this.setReserved("build","31");
 	} else {
-		_this.h["build"] = "30";
+		_this.h["build"] = "31";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -7023,6 +7023,23 @@ Enemy.prototype = $extend(Entity.prototype,{
 			this.velocity.set_y(0);
 		}
 	}
+	,chasePlayerM: function() {
+		this.set_path(null);
+		this._velocity.set_x(this.playerPos.x - this.x);
+		this._velocity.set_y(this.playerPos.y - this.y);
+		flixel_math__$FlxVector_FlxVector_$Impl_$.normalize(this._velocity);
+		this._velocity.scale(this.ENEMY_SPEED);
+		this.velocity.set_x(this._velocity.x);
+		this.velocity.set_y(this._velocity.y);
+	}
+	,stopChasingPlayer: function() {
+		if(this.velocity.x > 0) {
+			this.velocity.set_x(0);
+		}
+		if(this.velocity.y > 0) {
+			this.velocity.set_y(0);
+		}
+	}
 	,__class__: Enemy
 });
 var flixel_group_FlxTypedGroup = function(MaxSize) {
@@ -8599,22 +8616,30 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	}
 	,findPathAndChasePlayer: function(enemy) {
 		this.updatePlayerMidPoint(enemy);
-		var pathPoints = this._mapWalls;
-		var X = enemy.x;
-		var Y = enemy.y;
-		var point = flixel_math_FlxPoint._pool.get().set(X,Y);
-		point._inPool = false;
-		var X1 = this._survivor.x;
-		var Y1 = this._survivor.y;
-		var point1 = flixel_math_FlxPoint._pool.get().set(X1,Y1);
-		point1._inPool = false;
-		var pathPoints1 = pathPoints.findPath(point,point1);
-		if(enemy.path.active && pathPoints1 != null) {
-			enemy.path.addPoint(pathPoints1[pathPoints1.length - 1]);
-			return;
-		}
-		if(pathPoints1 != null && enemy.isOnScreen()) {
-			enemy.path.start(pathPoints1,50,0,true);
+		if(!this._mapWalls.ray(enemy.getMidpoint(),this._survivor.getMidpoint())) {
+			enemy.stopChasingPlayer();
+			if(enemy.path == null) {
+				enemy.set_path(new flixel_util_FlxPath());
+			}
+			var pathPoints = this._mapWalls;
+			var X = enemy.x;
+			var Y = enemy.y;
+			var point = flixel_math_FlxPoint._pool.get().set(X,Y);
+			point._inPool = false;
+			var X1 = this._survivor.x;
+			var Y1 = this._survivor.y;
+			var point1 = flixel_math_FlxPoint._pool.get().set(X1,Y1);
+			point1._inPool = false;
+			var pathPoints1 = pathPoints.findPath(point,point1);
+			if(enemy.path.active && pathPoints1 != null && (this._lastPlayerPos.x != this._survivor.x || this._lastPlayerPos.y != this._survivor.y)) {
+				enemy.path.addPoint(pathPoints1[pathPoints1.length - 1]);
+				return;
+			}
+			if(pathPoints1 != null && enemy.isOnScreen()) {
+				enemy.path.start(pathPoints1,50,0,true);
+			}
+		} else {
+			enemy.chasePlayerM();
 		}
 	}
 	,__class__: PlayState
@@ -8991,7 +9016,7 @@ StringTools.quoteWinArg = function(argument,escapeMetaCharacters) {
 var Survivor = function(x,y,bullets) {
 	this.money = 200.0;
 	var _g = new haxe_ds_IntMap();
-	_g.h[0] = 100;
+	_g.h[0] = 30;
 	this._bulletsMap = _g;
 	this._shootTimer = new flixel_util_FlxTimer();
 	var this1 = new flixel_math_FlxPoint(0,0);
@@ -78129,7 +78154,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 337830;
+	this.version = 461465;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = ["lime","utils","AssetCache"];

@@ -75,7 +75,22 @@ class Enemy extends Entity {
 
         //angle = FlxAngle.angleBetweenPoint(this, playerPos, true) - 180;
         //FlxVelocity.moveTowardsPoint(this, new FlxPoint(300,300), Std.int(ENEMY_SPEED));
+    }
 
+    public function chasePlayerM() {
+        path = null;
 
+        _velocity.x = playerPos.x - x;
+        _velocity.y = playerPos.y - y;
+        _velocity.normalize();
+        _velocity.scale(ENEMY_SPEED);
+        
+        velocity.x = _velocity.x;
+        velocity.y = _velocity.y;
+    }
+
+    public function stopChasingPlayer() {
+        if(velocity.x > 0) velocity.x = 0;
+        if(velocity.y > 0) velocity.y = 0;
     }
 }

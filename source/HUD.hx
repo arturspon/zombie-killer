@@ -77,10 +77,15 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         _health.text = "Health: " + s.playerHealth;
         _wave.text = "Wave " + (s.currentWave + 1);
 
-        var playerMoneyRounded = FlxMath.roundDecimal(s.playerMoney, 2);
-        _money.text = "$" + playerMoneyRounded;
+        // playerMoneyRounded:Float = FlxMath.roundDecimal(s.playerMoney, 2);
+        _money.text = "$" + s.playerMoney;
 
         var ammoForCurrentWeapon = _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem) == null ? 0 : _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem);
+        if(ammoForCurrentWeapon <= 10) {
+            _ammoForCurrentWeapon.color = FlxColor.RED;
+        } else {
+            _ammoForCurrentWeapon.color = FlxColor.WHITE;
+        }
         _ammoForCurrentWeapon.text = "Ammo: " + ammoForCurrentWeapon;
 
         drawTimeUntilNextWave(s);

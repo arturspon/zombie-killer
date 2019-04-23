@@ -1,38 +1,38 @@
 package;
 
-import flixel.math.FlxAngle;
-import flixel.FlxG;
-import flixel.math.FlxVector;
+import flixel.util.FlxPath;
 import flixel.math.FlxRandom;
+import flixel.math.FlxPoint;
+import flixel.math.FlxVector;
 
 class Enemy extends Entity {
-    var _playerToChase:Entity;
     var _velocity:FlxVector = new FlxVector();
     var ENEMY_SPEED:Float;
     var random = new FlxRandom();
+    public var playerPos:FlxPoint;
 
-    public function new(wave:Int, playerToChase:Entity) {
+    public function new(wave:Int) {
         super();
-        //makeGraphic(16, 16, 0xFFFF0000);
         loadGraphic(AssetPaths.zombie_running__png, true, 288, 311);
         animation.add("move", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], 16, true);
         animation.play("move");
 
         setGraphicSize(24, 24);
         updateHitbox();
-        
-        _playerToChase = playerToChase;
 
         setHealthByWave(wave);
         setRandomVelocityVariedByWave(wave);
+
+        playerPos = FlxPoint.get();
+        path = new FlxPath();
 
         _velocity.x = 0;
         _velocity.y = 0;
     }
 
     override public function update(elapsed:Float):Void {
-        super.update(elapsed);
         chasePlayer();
+        super.update(elapsed);
     }
 
     function setHealthByWave(wave:Int) {
@@ -60,14 +60,22 @@ class Enemy extends Entity {
     }
 
     function chasePlayer(){
-        _velocity.x = _playerToChase.x - x;
-        _velocity.y = _playerToChase.y - y;
-        _velocity.normalize();
-        _velocity.scale(ENEMY_SPEED);
-        
-        velocity.x = _velocity.x;
-        velocity.y = _velocity.y;
+        if(isOnScreen()) {
+            _velocity.x = playerPos.x - x;
+            _velocity.y = playerPos.y - y;
+            _velocity.normalize();
+            _velocity.scale(ENEMY_SPEED);
+            
+            velocity.x = _velocity.x;
+            velocity.y = _velocity.y;
+        } else {
+            velocity.x = 0;
+            velocity.y = 0;
+        }
 
-        angle = FlxAngle.angleBetween(_playerToChase, this, true) - 180;
+        //angle = FlxAngle.angleBetweenPoint(this, playerPos, true) - 180;
+        //FlxVelocity.moveTowardsPoint(this, new FlxPoint(300,300), Std.int(ENEMY_SPEED));
+
+
     }
 }

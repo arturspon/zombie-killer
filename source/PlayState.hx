@@ -1,5 +1,7 @@
 package;
 
+import flixel.util.FlxPath;
+import flixel.math.FlxPoint;
 import haxe.ds.HashMap;
 import flixel.math.FlxMath;
 import lime.math.Vector2;
@@ -56,6 +58,9 @@ class PlayState extends FlxState {
 	// Misc
 	var _random:FlxRandom = new FlxRandom();
 
+	// Pathfinding
+	var _lastPlayerPos:FlxPoint = new FlxPoint(0, 0);
+
 	override public function create():Void {
 		// Spawn points
 		ENEMIES_SPAWN_POINT_LIST = [new Vector2(-8, 238), new Vector2(FlxG.width, 134), new Vector2(FlxG.width, 213), new Vector2(475, FlxG.height)];
@@ -73,6 +78,8 @@ class PlayState extends FlxState {
 		// Start inventory with a weapon
  		inventoryItemsList = new Array<Int>();
 		inventoryItemsList.push(WEAPON_PISTOL);
+		
+		_survivor.path = new FlxPath();
 
 		add(_survivor);
 		add(_bullets);
@@ -89,11 +96,13 @@ class PlayState extends FlxState {
 
 	override public function update(elapsed:Float):Void	{
 		super.update(elapsed);
+
 		FlxG.overlap(_survivor, _enemies, onOverlap);
 		FlxG.overlap(_bullets, _enemies, onOverlap);
 		FlxG.collide(_enemies, _enemies);
 		FlxG.collide(_survivor, _mapWalls);
 		FlxG.collide(_enemies, _mapWalls);
+		_enemies.forEachAlive(findPathAndChasePlayer);
 		checkIfWaveIsOver();
 		playerHealth = _survivor.health;
 		playerMoney = _survivor.money;
@@ -118,7 +127,7 @@ class PlayState extends FlxState {
 		_enemies = new FlxTypedGroup<Enemy>();
 		_enemies_in_this_wave = SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP.get(currentWave) == null ? (currentWave * 2 + 5) : SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP.get(currentWave);
 		for(i in 0..._enemies_in_this_wave){
-			var enemy = new Enemy(currentWave, _survivor);
+			var enemy = new Enemy(currentWave);
 			enemy.kill();
 			_enemies.add(enemy);
 		}
@@ -141,6 +150,13 @@ class PlayState extends FlxState {
 		add(enemy);
 	}
 
+	function spawnEnemyAt(x:Int, y:Int) {
+		var enemy:Enemy = _enemies.getFirstAvailable();
+		enemy.reset(x, y);
+		add(enemy);
+		findPathAndChasePlayer(enemy);
+	}
+
 	function onOverlap(s1:FlxObject, s2:FlxObject):Void {
 		if (Std.is(s1, Survivor))
 			s1.hurt(1);
@@ -152,5 +168,29 @@ class PlayState extends FlxState {
 				_survivor.money += FlxMath.roundDecimal(_random.float(0.2, 1.2), 2);
 			}
 		}
+	}
+
+	function updatePlayerMidPoint(e:Enemy):Void {
+		e.playerPos.copyFrom(_survivor.getMidpoint());
+	}
+
+	function findPathAndChasePlayer(enemy:Enemy):Void {
+		updatePlayerMidPoint(enemy);
+
+		var pathPoints:Array<FlxPoint> = _mapWalls.findPath(
+			FlxPoint.get(enemy.x, enemy.y),
+			FlxPoint.get(_survivor.x, _survivor.y));
+
+		if(enemy.path.active && pathPoints != null) {
+			enemy.path.addPoint(pathPoints[pathPoints.length-1]);
+			return;
+		}
+		
+		// Tell unit to follow path
+		if (pathPoints != null && enemy.isOnScreen()) {
+			enemy.path.start(pathPoints, 50, FlxPath.FORWARD, true);
+			//_survivor.path.start(pathPoints);
+		}
+
 	}
 }

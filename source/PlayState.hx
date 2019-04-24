@@ -1,5 +1,6 @@
 package;
 
+import flixel.util.FlxColor;
 import flixel.util.FlxPath;
 import flixel.math.FlxPoint;
 import haxe.ds.HashMap;
@@ -12,14 +13,15 @@ import flixel.FlxState;
 import flixel.group.FlxGroup;
 import flixel.math.FlxRandom;
 import flixel.tile.FlxTilemap;
+import flixel.effects.particles.FlxEmitter;
 
 class PlayState extends FlxState {
 	public static var _hud:HUD;
 	var _survivor:Survivor;
     var _bullets:FlxTypedGroup<Bullet> = new FlxTypedGroup<Bullet>();
-    var _enemies:FlxTypedGroup<Enemy> = new FlxTypedGroup<Enemy>();
 	var _enemies_in_this_wave:Int;
 	var _enemies_killed_in_this_wave:Int = 0;
+    public static var enemies:FlxTypedGroup<Enemy> = new FlxTypedGroup<Enemy>();
 
 	public var playerHealth:Float;
 	public var playerMoney:Float;
@@ -49,11 +51,11 @@ class PlayState extends FlxState {
 
 	// Player's inventory
 	public static var currentInventorySelectedItem:Int = 0;
-	public static var inventoryItemsList:Array<Int>;
 
-	// WEAPONS	
+	// Items	
 	public static inline var WEAPON_PISTOL = 0;
 	public static inline var WEAPON_RIFLE = 1;
+	public static inline var LAND_MINE = 2;
 
 	// Misc
 	var _random:FlxRandom = new FlxRandom();
@@ -62,11 +64,11 @@ class PlayState extends FlxState {
 	var _lastPlayerPos:FlxPoint = new FlxPoint(0, 0);
 
 	// Mail	
-    var _mail:Mail;
+    public static var MAIL:Mail;
 
 	override public function create():Void {
 		// Mail
-        _mail = new Mail();
+        MAIL = new Mail();
 
 		// Spawn points
 		ENEMIES_SPAWN_POINT_LIST = [new Vector2(-8, 238), new Vector2(FlxG.width, 134), new Vector2(FlxG.width, 213), new Vector2(475, FlxG.height)];
@@ -79,24 +81,20 @@ class PlayState extends FlxState {
 		add(_mapGround);
 
 		_survivor = new Survivor(cast(SURVIVOR_SPAWN_POINT.x, Int), cast(SURVIVOR_SPAWN_POINT.y, Int), _bullets);
-		playerHealth = _survivor.health;
-
-		// Start inventory with a weapon
- 		inventoryItemsList = new Array<Int>();
-		inventoryItemsList.push(WEAPON_PISTOL);
+		playerHealth = _survivor.health;		
 		
 		_survivor.path = new FlxPath();
 
-        add(_mail);
+        add(MAIL);
 		add(_survivor);
 		add(_bullets);
-		add(_enemies);
+		add(enemies);
 
 		_hud = new HUD(_survivor);
 		add(_hud);
 
 		populateWave();
-		enemySpawner(null);
+		enemySpawner(null);	
 
 		super.create();
 	}
@@ -104,12 +102,12 @@ class PlayState extends FlxState {
 	override public function update(elapsed:Float):Void	{
 		super.update(elapsed);
 
-		FlxG.overlap(_survivor, _enemies, onOverlap);
-		FlxG.overlap(_bullets, _enemies, onOverlap);
-		FlxG.collide(_enemies, _enemies);
+		FlxG.overlap(_survivor, enemies, onOverlap);
+		FlxG.overlap(_bullets, enemies, onOverlap);
+		FlxG.collide(enemies, enemies);
 		FlxG.collide(_survivor, _mapWalls);
-		FlxG.collide(_enemies, _mapWalls);
-		_enemies.forEachAlive(findPathAndChasePlayer);
+		FlxG.collide(enemies, _mapWalls);
+		enemies.forEachAlive(findPathAndChasePlayer);
 		checkIfWaveIsOver();
 		playerHealth = _survivor.health;
 		playerMoney = _survivor.money;
@@ -131,12 +129,12 @@ class PlayState extends FlxState {
 	}
 
 	function populateWave() {
-		_enemies = new FlxTypedGroup<Enemy>();
+		enemies = new FlxTypedGroup<Enemy>();
 		_enemies_in_this_wave = SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP.get(currentWave) == null ? (currentWave * 2 + 5) : SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP.get(currentWave);
 		for(i in 0..._enemies_in_this_wave){
 			var enemy = new Enemy(currentWave);
 			enemy.kill();
-			_enemies.add(enemy);
+			enemies.add(enemy);
 		}
 	}
 	
@@ -152,13 +150,13 @@ class PlayState extends FlxState {
 		var random = new FlxRandom();
 		var pointToSpawn:Vector2 = ENEMIES_SPAWN_POINT_LIST[random.int(0, ENEMIES_SPAWN_POINT_LIST.length - 1)];
 		
-		var enemy:Enemy = _enemies.getFirstAvailable();
+		var enemy:Enemy = enemies.getFirstAvailable();
 		enemy.reset(pointToSpawn.x, pointToSpawn.y);
 		add(enemy);
 	}
 
 	function spawnEnemyAt(x:Int, y:Int) {
-		var enemy:Enemy = _enemies.getFirstAvailable();
+		var enemy:Enemy = enemies.getFirstAvailable();
 		enemy.reset(x, y);
 		add(enemy);
 		findPathAndChasePlayer(enemy);
@@ -166,7 +164,7 @@ class PlayState extends FlxState {
 
 	function onOverlap(s1:FlxObject, s2:FlxObject):Void {
 		if (Std.is(s1, Survivor) && Std.is(s2, Enemy)){
-			cast(s2, Enemy).attack(_mail, cast(s1, Survivor));
+			cast(s2, Enemy).attack(MAIL, cast(s1, Survivor));
 		}
 		if(Std.is(s1, Bullet)){
 			s1.kill();

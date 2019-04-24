@@ -15,14 +15,16 @@ class Survivor extends Entity {
     static var PLAYER_SPEED = 1.5;
     static var BULLET_SPEED = 2048;
     static var FIRE_RATE_MAP = [
-        PlayState.WEAPON_PISTOL => 1 / 5,
+        PlayState.WEAPON_PISTOL => 1 / 7,
         PlayState.WEAPON_RIFLE => 1 / 11.1
     ];
     public var _bulletsMap:Map<Int, Int> = [
         PlayState.WEAPON_PISTOL => 30
     ];
 
-    public var money:Float = 200.0;
+    // Inventory
+    public var money:Float = 20000.0;
+    public var inventoryList:Array<Int> = [PlayState.WEAPON_PISTOL];    
     
 	 // Sound effects
 	 var _sndPistolShot:FlxSound;
@@ -31,8 +33,7 @@ class Survivor extends Entity {
         super(x, y);
         health = 10;
         
-        loadGraphic(
-            AssetPaths.survivor__png, true, 258, 220);
+        loadGraphic(AssetPaths.survivor__png, true, 258, 220);
 
         setGraphicSize(24, 24);
         updateHitbox();
@@ -100,11 +101,12 @@ class Survivor extends Entity {
     }
 
     function shoot() {
-        if (_shootTimer.active) return;
+        if(_shootTimer.active) return;
+        if(HUD.isItemStoreOpen) return;
 
-        if(PlayState.inventoryItemsList.indexOf(PlayState.currentInventorySelectedItem) >= 0) {
-            if(PlayState.currentInventorySelectedItem == PlayState.WEAPON_PISTOL ||
-                PlayState.currentInventorySelectedItem == PlayState.WEAPON_RIFLE) {
+        if(inventoryList.indexOf(PlayState.currentInventorySelectedItem) >= 0) {
+            if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_PISTOL ||
+                inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) {
                     if(_bulletsMap.get(PlayState.currentInventorySelectedItem) <= 0) return;
                     _bulletsMap.set(PlayState.currentInventorySelectedItem, _bulletsMap.get(PlayState.currentInventorySelectedItem)-1);
 

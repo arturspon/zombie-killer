@@ -40,6 +40,12 @@ class Enemy extends Entity {
         super.update(elapsed);
     }
 
+    override public function onMessage(m:Message):Void {
+        if(m.op == Message.OP_DAMAGE){
+            hurt(m.data);
+        }
+    }
+
     function setHealthByWave(wave:Int) {
         health = 2 + wave;
     }
@@ -110,4 +116,5 @@ class Enemy extends Entity {
         m.data = 1;
         mail.send(m);
     }
+    
 }

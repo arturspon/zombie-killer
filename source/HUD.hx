@@ -31,16 +31,19 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
     // Item store
     var _itemStore:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
-    var _isItemStoreVisible = false;
+    public static var isItemStoreOpen = false;
     var _storePriceMap = [
-        PlayState.WEAPON_RIFLE => 10.0
+        PlayState.WEAPON_RIFLE => 2700,
+        PlayState.LAND_MINE => 500
     ];
     var _itemSpriteMap = [
         PlayState.WEAPON_PISTOL => AssetPaths.Tokarev_TT_33__png,
-        PlayState.WEAPON_RIFLE => AssetPaths.StG_44__png
+        PlayState.WEAPON_RIFLE => AssetPaths.StG_44__png,
+        PlayState.LAND_MINE => AssetPaths.land_mine_icon__png
     ];
     var _itemQtdToBuyMap = [ // Bullets, if the item is a weapon.
-        PlayState.WEAPON_RIFLE => 100
+        PlayState.WEAPON_RIFLE => 100,
+        PlayState.LAND_MINE => 1
     ];
     
     public function new(survivor:Survivor){
@@ -121,7 +124,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
     public function updateInventory() {
         // Draw items in inventory bar
-        for(item in PlayState.inventoryItemsList) {
+        for(item in _survivor.inventoryList) {
             if(_inventoryRenderedItems.indexOf(item) < 0) {
                 var xPositionToRenderItem = (FlxG.width / 2 - inventoryBarTotalWidth / 2) + inventorySpaceSquareSize * _inventoryRenderedItems.length;
 
@@ -148,11 +151,11 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     }
 
     function drawStore() {
-        if(_isItemStoreVisible) {
+        if(isItemStoreOpen) {
             _itemStore.forEach(function(s:FlxSprite) {
                 remove(s);
             }, false);
-            _isItemStoreVisible = false;
+            isItemStoreOpen = false;
             return;
         }
 
@@ -160,7 +163,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
             _itemStore.forEach(function(s:FlxSprite) {
                 add(s);
             }, false);
-            _isItemStoreVisible = true;
+            isItemStoreOpen = true;
             return;
         }
 
@@ -195,7 +198,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
             itemToSell.loadGraphic(_itemSpriteMap.get(itemKey), false);                       
             itemToSell.setGraphicSize(itemStoreSpaceSize - itemStoreSpacePadding);
             itemToSell.angle = -24;
-            itemToSell.x = itemStoreSpaceSize / 2 + itemToSell.width - 8;
+            itemToSell.x = itemX + itemToSell.width / 2;
             itemToSell.y = itemY + 32;
             _itemStore.add(itemToSell);
 
@@ -203,7 +206,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
                 buyItem(itemKey);
             });
             btnBuy.text = "Buy!";
-            btnBuy.x = itemStoreSpaceSize / 2 + btnBuy.width / 2 + 10;
+            btnBuy.x = itemX + btnBuy.width / 2 - 16;
             btnBuy.y = itemToSell.y + 64;
             _itemStore.add(btnBuy);
 
@@ -220,14 +223,15 @@ class HUD extends FlxTypedGroup<FlxSprite> {
             add(s);
         }, false);
         
-        _isItemStoreVisible = true;
+        isItemStoreOpen = true;
     }
 
     function buyItem(itemId:Int) {
         var itemPrice = _storePriceMap.get(itemId);
         if((_survivor.money - itemPrice) >= 0) {
             _survivor.money -= itemPrice;
-            PlayState.inventoryItemsList.push(itemId);
+            //PlayState.inventoryItemsList.push(itemId);
+            _survivor.inventoryList.push(itemId);
 
             var qtdToBuy =  _survivor._bulletsMap.get(itemId) == null ? _itemQtdToBuyMap.get(itemId) : (_itemQtdToBuyMap.get(itemId) + _survivor._bulletsMap.get(itemId));
             _survivor._bulletsMap.set(itemId, qtdToBuy);

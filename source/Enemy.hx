@@ -93,4 +93,13 @@ class Enemy extends Entity {
         if(velocity.x > 0) velocity.x = 0;
         if(velocity.y > 0) velocity.y = 0;
     }
+
+    public function attack(mail:Mail, player:Survivor) {
+        var m:Message = new Message();
+        m.from = this;
+        m.to = player;
+        m.op = Message.OP_DAMAGE;
+        m.data = 1;
+        mail.send(m);
+    }
 }

@@ -61,7 +61,13 @@ class PlayState extends FlxState {
 	// Pathfinding
 	var _lastPlayerPos:FlxPoint = new FlxPoint(0, 0);
 
+	// Mail	
+    var _mail:Mail;
+
 	override public function create():Void {
+		// Mail
+        _mail = new Mail();
+
 		// Spawn points
 		ENEMIES_SPAWN_POINT_LIST = [new Vector2(-8, 238), new Vector2(FlxG.width, 134), new Vector2(FlxG.width, 213), new Vector2(475, FlxG.height)];
 
@@ -81,6 +87,7 @@ class PlayState extends FlxState {
 		
 		_survivor.path = new FlxPath();
 
+        add(_mail);
 		add(_survivor);
 		add(_bullets);
 		add(_enemies);
@@ -158,8 +165,9 @@ class PlayState extends FlxState {
 	}
 
 	function onOverlap(s1:FlxObject, s2:FlxObject):Void {
-		if (Std.is(s1, Survivor))
-			s1.hurt(1);
+		if (Std.is(s1, Survivor) && Std.is(s2, Enemy)){
+			cast(s2, Enemy).attack(_mail, cast(s1, Survivor));
+		}
 		if(Std.is(s1, Bullet)){
 			s1.kill();
 			s2.hurt(1);

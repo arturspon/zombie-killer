@@ -895,9 +895,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","31");
+		_this.setReserved("build","32");
 	} else {
-		_this.h["build"] = "31";
+		_this.h["build"] = "32";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -7040,6 +7040,14 @@ Enemy.prototype = $extend(Entity.prototype,{
 			this.velocity.set_y(0);
 		}
 	}
+	,attack: function(mail,player) {
+		var m = new Message();
+		m.from = this;
+		m.to = player;
+		m.op = 0;
+		m.data = 1;
+		mail.send(m);
+	}
 	,__class__: Enemy
 });
 var flixel_group_FlxTypedGroup = function(MaxSize) {
@@ -7909,6 +7917,31 @@ _$List_ListIterator.prototype = {
 	}
 	,__class__: _$List_ListIterator
 };
+var Mail = function(X,Y,Width,Height) {
+	this._queue = [];
+	flixel_FlxObject.call(this,X,Y,Width,Height);
+};
+$hxClasses["Mail"] = Mail;
+Mail.__name__ = ["Mail"];
+Mail.__super__ = flixel_FlxObject;
+Mail.prototype = $extend(flixel_FlxObject.prototype,{
+	_queue: null
+	,update: function(elapsed) {
+		var _g = 0;
+		var _g1 = this._queue;
+		while(_g < _g1.length) {
+			var m = _g1[_g];
+			++_g;
+			m.to.onMessage(m);
+		}
+		this._queue = [];
+		flixel_FlxObject.prototype.update.call(this,elapsed);
+	}
+	,send: function(m) {
+		this._queue.push(m);
+	}
+	,__class__: Mail
+});
 var ManifestResources = function() { };
 $hxClasses["ManifestResources"] = ManifestResources;
 ManifestResources.__name__ = ["ManifestResources"];
@@ -8511,7 +8544,9 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,secondsRemainingUntilNextWave: null
 	,_random: null
 	,_lastPlayerPos: null
+	,_mail: null
 	,create: function() {
+		this._mail = new Mail();
 		PlayState.ENEMIES_SPAWN_POINT_LIST = [new lime_math_Vector2(-8,238),new lime_math_Vector2(flixel_FlxG.width,134),new lime_math_Vector2(flixel_FlxG.width,213),new lime_math_Vector2(475,flixel_FlxG.height)];
 		this._mapWalls = new flixel_tile_FlxTilemap();
 		this._mapWalls.loadMapFromCSV("assets/data/cave_walls.csv","assets/images/cave_tileset.png",16,16,null,0,1);
@@ -8524,6 +8559,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		PlayState.inventoryItemsList = [];
 		PlayState.inventoryItemsList.push(0);
 		this._survivor.set_path(new flixel_util_FlxPath());
+		this.add(this._mail);
 		this.add(this._survivor);
 		this.add(this._bullets);
 		this.add(this._enemies);
@@ -8593,8 +8629,8 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.findPathAndChasePlayer(enemy);
 	}
 	,onOverlap: function(s1,s2) {
-		if(js_Boot.__instanceof(s1,Survivor)) {
-			s1.hurt(1);
+		if(js_Boot.__instanceof(s1,Survivor) && js_Boot.__instanceof(s2,Enemy)) {
+			(js_Boot.__cast(s2 , Enemy)).attack(this._mail,js_Boot.__cast(s1 , Survivor));
 		}
 		if(js_Boot.__instanceof(s1,Bullet)) {
 			s1.kill();
@@ -9049,6 +9085,11 @@ Survivor.prototype = $extend(Entity.prototype,{
 		Entity.prototype.update.call(this,elapsed);
 		this.checkInputs();
 		this.lookAtMousePointer();
+	}
+	,onMessage: function(m) {
+		if(m.op == 0) {
+			this.hurt(m.data);
+		}
 	}
 	,giveInitialBullets: function() {
 		var _g = 0;
@@ -78154,7 +78195,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 461465;
+	this.version = 286759;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = ["lime","utils","AssetCache"];

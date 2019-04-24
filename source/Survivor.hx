@@ -56,6 +56,12 @@ class Survivor extends Entity {
         lookAtMousePointer();
 	}
 
+    override public function onMessage(m:Message):Void {
+        if(m.op == Message.OP_DAMAGE){
+            hurt(m.data);
+        }
+    }
+
     function giveInitialBullets() {
         for(i in 0...100){
             var s = new Bullet();

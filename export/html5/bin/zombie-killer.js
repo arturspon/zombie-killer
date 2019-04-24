@@ -895,9 +895,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","32");
+		_this.setReserved("build","33");
 	} else {
-		_this.h["build"] = "32";
+		_this.h["build"] = "33";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -6960,6 +6960,7 @@ Entity.prototype = $extend(flixel_FlxSprite.prototype,{
 	,__class__: Entity
 });
 var Enemy = function(wave) {
+	this._attackTimer = new flixel_util_FlxTimer();
 	this.random = new flixel_math_FlxRandom();
 	var this1 = new flixel_math_FlxPoint(0,0);
 	this._velocity = this1;
@@ -6986,6 +6987,7 @@ Enemy.prototype = $extend(Entity.prototype,{
 	,ENEMY_SPEED: null
 	,random: null
 	,playerPos: null
+	,_attackTimer: null
 	,update: function(elapsed) {
 		this.chasePlayer();
 		Entity.prototype.update.call(this,elapsed);
@@ -7041,6 +7043,10 @@ Enemy.prototype = $extend(Entity.prototype,{
 		}
 	}
 	,attack: function(mail,player) {
+		if(this._attackTimer.active) {
+			return;
+		}
+		this._attackTimer.start(Enemy.ATTACK_TIME_INTERVAL);
 		var m = new Message();
 		m.from = this;
 		m.to = player;
@@ -119737,6 +119743,7 @@ flixel_FlxObject._secondSeparateFlxRect = (function($this) {
 	$r = rect;
 	return $r;
 }(this));
+Enemy.ATTACK_TIME_INTERVAL = 1;
 openfl_text_Font.__fontByName = new haxe_ds_StringMap();
 openfl_text_Font.__registeredFonts = [];
 Message.OP_DAMAGE = 0;

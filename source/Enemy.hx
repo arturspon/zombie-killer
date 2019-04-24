@@ -4,12 +4,17 @@ import flixel.util.FlxPath;
 import flixel.math.FlxRandom;
 import flixel.math.FlxPoint;
 import flixel.math.FlxVector;
+import flixel.util.FlxTimer;
 
 class Enemy extends Entity {
     var _velocity:FlxVector = new FlxVector();
     var ENEMY_SPEED:Float;
     var random = new FlxRandom();
     public var playerPos:FlxPoint;
+
+    // Time to attack
+    var _attackTimer = new FlxTimer();
+    static var ATTACK_TIME_INTERVAL = 1;
 
     public function new(wave:Int) {
         super();
@@ -95,6 +100,9 @@ class Enemy extends Entity {
     }
 
     public function attack(mail:Mail, player:Survivor) {
+        if (_attackTimer.active) return;
+        _attackTimer.start(ATTACK_TIME_INTERVAL);
+
         var m:Message = new Message();
         m.from = this;
         m.to = player;

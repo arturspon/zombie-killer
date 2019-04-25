@@ -895,9 +895,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","40");
+		_this.setReserved("build","41");
 	} else {
-		_this.h["build"] = "40";
+		_this.h["build"] = "41";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -8060,11 +8060,22 @@ LandMine.prototype = $extend(Entity.prototype,{
 	,_explosionParticles: null
 	,update: function(elapsed) {
 		flixel_FlxG.overlap(this,PlayState.enemies,$bind(this,this.explode));
-		flixel_FlxG.overlap(this._explosionParticles,PlayState.enemies,$bind(this,this.dealDamage));
+		flixel_FlxG.overlap(this._explosionParticles,PlayState.enemies,$bind(this,this.dealDamage),flixel_FlxObject.separate);
+		if(this._currentState != "armed" && !this._explosionParticles.emitting) {
+			this.kill();
+		}
 		Entity.prototype.update.call(this,elapsed);
 	}
 	,explode: function(s1,s2) {
-		this._explosionParticles.start();
+		if(this._currentState == "armed") {
+			this._currentState = "exploding";
+			this._explosionParticles.start(true,0.01,0);
+			this._explosionParticles.lifespan.set(1,3);
+			this._explosionParticles.color.set(-1,-23296,-65536);
+			this._explosionParticles.set_solid(true);
+			this._explosionParticles.alpha.set(1,1,0,0);
+			this._explosionParticles.launchMode = flixel_effects_particles_FlxEmitterMode.CIRCLE;
+		}
 		this.set_alpha(0);
 	}
 	,dealDamage: function(s1,s2) {
@@ -8551,47 +8562,6 @@ Message.prototype = {
 	,data: null
 	,op: null
 	,__class__: Message
-};
-var haxe_ds_IntMap = function() {
-	this.h = { };
-};
-$hxClasses["haxe.ds.IntMap"] = haxe_ds_IntMap;
-haxe_ds_IntMap.__name__ = ["haxe","ds","IntMap"];
-haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
-haxe_ds_IntMap.prototype = {
-	h: null
-	,set: function(key,value) {
-		this.h[key] = value;
-	}
-	,get: function(key) {
-		return this.h[key];
-	}
-	,exists: function(key) {
-		return this.h.hasOwnProperty(key);
-	}
-	,remove: function(key) {
-		if(!this.h.hasOwnProperty(key)) {
-			return false;
-		}
-		delete(this.h[key]);
-		return true;
-	}
-	,keys: function() {
-		var a = [];
-		for( var key in this.h ) if(this.h.hasOwnProperty(key)) {
-			a.push(key | 0);
-		}
-		return HxOverrides.iter(a);
-	}
-	,iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref[i];
-		}};
-	}
-	,__class__: haxe_ds_IntMap
 };
 var lime_math_Vector2 = function(x,y) {
 	if(y == null) {
@@ -9334,36 +9304,33 @@ Survivor.prototype = $extend(Entity.prototype,{
 		if(HUD.isItemStoreOpen) {
 			return;
 		}
-		if(this.inventoryList.indexOf(PlayState.currentInventorySelectedItem) >= 0) {
-			flixel_FlxG.log.advanced(PlayState.currentInventorySelectedItem,flixel_system_debug_log_LogStyle.NORMAL);
-			flixel_FlxG.log.advanced(this.inventoryList[PlayState.currentInventorySelectedItem],flixel_system_debug_log_LogStyle.NORMAL);
-			flixel_FlxG.log.advanced(this.inventoryList,flixel_system_debug_log_LogStyle.NORMAL);
-			flixel_FlxG.log.advanced("---",flixel_system_debug_log_LogStyle.NORMAL);
-			if(this.inventoryList[PlayState.currentInventorySelectedItem] == 0 || this.inventoryList[PlayState.currentInventorySelectedItem] == 1) {
-				if(this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] <= 0) {
-					return;
-				}
-				this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] = this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] - 1;
-				this._shootTimer.start(Survivor.FIRE_RATE_MAP.h[this.inventoryList[PlayState.currentInventorySelectedItem]]);
-				this._velocity.set_x(flixel_FlxG.mouse.x - this.x);
-				this._velocity.set_y(flixel_FlxG.mouse.y - this.y);
-				flixel_math__$FlxVector_FlxVector_$Impl_$.normalize(this._velocity);
-				this._velocity.scale(Survivor.BULLET_SPEED);
-				var bullet = this._bullets.getFirstAvailable();
-				bullet.reset(this.x,this.y);
-				bullet.velocity.set_x(this._velocity.x);
-				bullet.velocity.set_y(this._velocity.y);
-				this._sndPistolShot.play(true);
+		if(this.inventoryList[PlayState.currentInventorySelectedItem] == 0 || this.inventoryList[PlayState.currentInventorySelectedItem] == 1) {
+			flixel_FlxG.log.advanced("tchau",flixel_system_debug_log_LogStyle.NORMAL);
+			if(this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] <= 0) {
 				return;
 			}
-			if(this.inventoryList[PlayState.currentInventorySelectedItem] == 2) {
-				if(this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] <= 0) {
-					return;
-				}
-				this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] = this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] - 1;
-				flixel_FlxG.game._state.add(new LandMine(flixel_FlxG.mouse.x,flixel_FlxG.mouse.y));
+			this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] = this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] - 1;
+			this._shootTimer.start(Survivor.FIRE_RATE_MAP.h[this.inventoryList[PlayState.currentInventorySelectedItem]]);
+			this._velocity.set_x(flixel_FlxG.mouse.x - this.x);
+			this._velocity.set_y(flixel_FlxG.mouse.y - this.y);
+			flixel_math__$FlxVector_FlxVector_$Impl_$.normalize(this._velocity);
+			this._velocity.scale(Survivor.BULLET_SPEED);
+			var bullet = this._bullets.getFirstAvailable();
+			bullet.reset(this.x,this.y);
+			bullet.velocity.set_x(this._velocity.x);
+			bullet.velocity.set_y(this._velocity.y);
+			this._sndPistolShot.play(true);
+			return;
+		}
+		if(this.inventoryList[PlayState.currentInventorySelectedItem] == 2) {
+			flixel_FlxG.log.advanced("oi",flixel_system_debug_log_LogStyle.NORMAL);
+			if(this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] <= 0) {
 				return;
 			}
+			this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] = this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] - 1;
+			flixel_FlxG.game._state.add(new LandMine(flixel_FlxG.mouse.x,flixel_FlxG.mouse.y));
+			flixel_FlxG.log.advanced("oi2",flixel_system_debug_log_LogStyle.NORMAL);
+			return;
 		}
 	}
 	,updateInventorySelectedItem: function() {
@@ -23660,6 +23627,47 @@ flixel_input_gamepad_FlxGamepadButton.prototype = $extend(flixel_input_FlxInput.
 	value: null
 	,__class__: flixel_input_gamepad_FlxGamepadButton
 });
+var haxe_ds_IntMap = function() {
+	this.h = { };
+};
+$hxClasses["haxe.ds.IntMap"] = haxe_ds_IntMap;
+haxe_ds_IntMap.__name__ = ["haxe","ds","IntMap"];
+haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
+haxe_ds_IntMap.prototype = {
+	h: null
+	,set: function(key,value) {
+		this.h[key] = value;
+	}
+	,get: function(key) {
+		return this.h[key];
+	}
+	,exists: function(key) {
+		return this.h.hasOwnProperty(key);
+	}
+	,remove: function(key) {
+		if(!this.h.hasOwnProperty(key)) {
+			return false;
+		}
+		delete(this.h[key]);
+		return true;
+	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h ) if(this.h.hasOwnProperty(key)) {
+			a.push(key | 0);
+		}
+		return HxOverrides.iter(a);
+	}
+	,iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref[i];
+		}};
+	}
+	,__class__: haxe_ds_IntMap
+};
 var flixel_input_gamepad__$FlxGamepadInputID_FlxGamepadInputID_$Impl_$ = {};
 $hxClasses["flixel.input.gamepad._FlxGamepadInputID.FlxGamepadInputID_Impl_"] = flixel_input_gamepad__$FlxGamepadInputID_FlxGamepadInputID_$Impl_$;
 flixel_input_gamepad__$FlxGamepadInputID_FlxGamepadInputID_$Impl_$.__name__ = ["flixel","input","gamepad","_FlxGamepadInputID","FlxGamepadInputID_Impl_"];
@@ -78338,7 +78346,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 206987;
+	this.version = 371087;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = ["lime","utils","AssetCache"];

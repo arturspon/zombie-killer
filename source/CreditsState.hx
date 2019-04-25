@@ -8,10 +8,18 @@ import flixel.ui.FlxButton;
 class CreditsState extends FlxState {
     var _creditsText:FlxText;
     var _btnBack:FlxButton;
-    var _CREDITS_VELOCITY = -256;
+    var _CREDITS_VELOCITY = -64;
 
     override public function create():Void{
-        _creditsText = new FlxText(0, 0, 0, "Created by:\nArtur Sponchiado\n\n\n\nSpecial thanks:\nHaxeFlixel", 12);
+        _creditsText = new FlxText(0, 0, 0, 
+            "Created by:\nArtur Sponchiado\n\n\n\n" + 
+            "Animated top down survivor player by Riley Gombart\navailable at https://opengameart.org/content/animated-top-down-survivor-player\n\n" +
+            "Animated top down zombie by Riley Gombart\navailable at https://opengameart.org/content/animated-top-down-zombie\n\n" +
+            "Gun fire sound by GoodSoundForYou\navailable at http://soundbible.com/1998-Gun-Fire.html\n\n" +
+            "Cave tileset by MrBeast\navailable at https://opengameart.org/content/cave-tileset-0\n\n" +
+            "\n\n\n\n" +
+            "Special thanks:\nHaxeFlixel", 
+            12);
         _creditsText.x = FlxG.width / 2 - _creditsText.width / 2;
         _creditsText.y = FlxG.height;
         _creditsText.moves = true;

@@ -895,9 +895,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","42");
+		_this.setReserved("build","43");
 	} else {
-		_this.h["build"] = "42";
+		_this.h["build"] = "43";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -7482,7 +7482,7 @@ flixel_FlxState.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 	,__properties__: $extend(flixel_group_FlxTypedGroup.prototype.__properties__,{set_bgColor:"set_bgColor",get_bgColor:"get_bgColor"})
 });
 var CreditsState = function(MaxSize) {
-	this._CREDITS_VELOCITY = -256;
+	this._CREDITS_VELOCITY = -64;
 	flixel_FlxState.call(this,MaxSize);
 };
 $hxClasses["CreditsState"] = CreditsState;
@@ -7493,7 +7493,7 @@ CreditsState.prototype = $extend(flixel_FlxState.prototype,{
 	,_btnBack: null
 	,_CREDITS_VELOCITY: null
 	,create: function() {
-		this._creditsText = new flixel_text_FlxText(0,0,0,"Created by:\nArtur Sponchiado\n\n\n\nSpecial thanks:\nHaxeFlixel",12);
+		this._creditsText = new flixel_text_FlxText(0,0,0,"Created by:\nArtur Sponchiado\n\n\n\n" + "Animated top down survivor player by Riley Gombart\navailable at https://opengameart.org/content/animated-top-down-survivor-player\n\n" + "Animated top down zombie by Riley Gombart\navailable at https://opengameart.org/content/animated-top-down-zombie\n\n" + "Gun fire sound by GoodSoundForYou\navailable at http://soundbible.com/1998-Gun-Fire.html\n\n" + "Cave tileset by MrBeast\navailable at https://opengameart.org/content/cave-tileset-0\n\n" + "\n\n\n\n" + "Special thanks:\nHaxeFlixel",12);
 		this._creditsText.set_x(flixel_FlxG.width / 2 - this._creditsText.get_width() / 2);
 		this._creditsText.set_y(flixel_FlxG.height);
 		this._creditsText.set_moves(true);
@@ -7733,6 +7733,47 @@ Enemy.prototype = $extend(Entity.prototype,{
 	}
 	,__class__: Enemy
 });
+var haxe_ds_IntMap = function() {
+	this.h = { };
+};
+$hxClasses["haxe.ds.IntMap"] = haxe_ds_IntMap;
+haxe_ds_IntMap.__name__ = ["haxe","ds","IntMap"];
+haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
+haxe_ds_IntMap.prototype = {
+	h: null
+	,set: function(key,value) {
+		this.h[key] = value;
+	}
+	,get: function(key) {
+		return this.h[key];
+	}
+	,exists: function(key) {
+		return this.h.hasOwnProperty(key);
+	}
+	,remove: function(key) {
+		if(!this.h.hasOwnProperty(key)) {
+			return false;
+		}
+		delete(this.h[key]);
+		return true;
+	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h ) if(this.h.hasOwnProperty(key)) {
+			a.push(key | 0);
+		}
+		return HxOverrides.iter(a);
+	}
+	,iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref[i];
+		}};
+	}
+	,__class__: haxe_ds_IntMap
+};
 var HUD = function(survivor) {
 	var _g = new haxe_ds_IntMap();
 	_g.h[1] = 100;
@@ -7916,7 +7957,7 @@ HUD.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 			flixel_util_FlxSpriteUtil.updateSpriteGraphic(itemToSell);
 			itemToSell.updateFramePixels();
 			itemToSell.set_angle(HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[itemKey2[0]] == null ? 0 : HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[itemKey2[0]]);
-			itemToSell.set_x(itemX);
+			itemToSell.set_x(itemX + itemToSell.get_width() / 2);
 			itemToSell.set_y(itemY + 32);
 			this._itemStore.add(itemToSell);
 			var btnBuy = new flixel_ui_FlxButton(0,0,"",(function(itemKey3) {
@@ -23652,47 +23693,6 @@ flixel_input_gamepad_FlxGamepadButton.prototype = $extend(flixel_input_FlxInput.
 	value: null
 	,__class__: flixel_input_gamepad_FlxGamepadButton
 });
-var haxe_ds_IntMap = function() {
-	this.h = { };
-};
-$hxClasses["haxe.ds.IntMap"] = haxe_ds_IntMap;
-haxe_ds_IntMap.__name__ = ["haxe","ds","IntMap"];
-haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
-haxe_ds_IntMap.prototype = {
-	h: null
-	,set: function(key,value) {
-		this.h[key] = value;
-	}
-	,get: function(key) {
-		return this.h[key];
-	}
-	,exists: function(key) {
-		return this.h.hasOwnProperty(key);
-	}
-	,remove: function(key) {
-		if(!this.h.hasOwnProperty(key)) {
-			return false;
-		}
-		delete(this.h[key]);
-		return true;
-	}
-	,keys: function() {
-		var a = [];
-		for( var key in this.h ) if(this.h.hasOwnProperty(key)) {
-			a.push(key | 0);
-		}
-		return HxOverrides.iter(a);
-	}
-	,iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref[i];
-		}};
-	}
-	,__class__: haxe_ds_IntMap
-};
 var flixel_input_gamepad__$FlxGamepadInputID_FlxGamepadInputID_$Impl_$ = {};
 $hxClasses["flixel.input.gamepad._FlxGamepadInputID.FlxGamepadInputID_Impl_"] = flixel_input_gamepad__$FlxGamepadInputID_FlxGamepadInputID_$Impl_$;
 flixel_input_gamepad__$FlxGamepadInputID_FlxGamepadInputID_$Impl_$.__name__ = ["flixel","input","gamepad","_FlxGamepadInputID","FlxGamepadInputID_Impl_"];
@@ -78371,7 +78371,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 864534;
+	this.version = 235553;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = ["lime","utils","AssetCache"];

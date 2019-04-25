@@ -47,7 +47,7 @@ class PlayState extends FlxState {
 	public static var SPECIAL_ENEMY_VELOCITY_IN_WAVE_MAP:Map<Int, Int> = [ // If the requested key is null, them time is 5 seconds.
 		4 => 50
 	];
-	static var SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP:Map<Int, Vector2>;
+	static var SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP:Map<Int, Vector2> = new Map<Int, Vector2>();
 	public var secondsRemainingUntilNextWave:Int = 0;
 
 	// Player's inventory

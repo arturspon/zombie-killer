@@ -137,10 +137,10 @@ class HUD extends FlxTypedGroup<FlxSprite> {
             if(_inventoryRenderedItems.indexOf(item) < 0) {
                 var xPositionToRenderItem = (FlxG.width / 2 - inventoryBarTotalWidth / 2) + inventorySpaceSquareSize * _inventoryRenderedItems.length;
                 
-                var s = new FlxSprite(xPositionToRenderItem, inventorySpaceSquareSize / 2 - 4);
+                var s = new FlxSprite(xPositionToRenderItem, inventorySpaceSquareSize / 2 - 5);
                 s.loadGraphic(_itemSpriteMap.get(item), false);
                 
-                s.setGraphicSize(32);
+                s.setGraphicSize(28);
                 s.updateHitbox();
                 s.updateSpriteGraphic();
                 s.angle = (_CUSTOM_INVENTORY_SPRITE_ANGLES.get(item) == null ? 0 : _CUSTOM_INVENTORY_SPRITE_ANGLES.get(item));
@@ -205,12 +205,12 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
             var itemToSell = new FlxSprite();
             itemToSell.loadGraphic(_itemSpriteMap.get(itemKey), false);                       
-            itemToSell.setGraphicSize(itemStoreSpaceSize - itemStoreSpacePadding);
+            itemToSell.setGraphicSize(48);
             itemToSell.updateSpriteGraphic();
             itemToSell.updateFramePixels();
             itemToSell.angle = (_CUSTOM_INVENTORY_SPRITE_ANGLES.get(itemKey) == null ? 0 : _CUSTOM_INVENTORY_SPRITE_ANGLES.get(itemKey));                
-            itemToSell.x = itemX + itemToSell.width / 2;
-            itemToSell.y = itemY + 32;
+            itemToSell.x = (itemX + itemStoreSpaceSize/2) - itemToSell.width / 2;
+            itemToSell.y = itemY + 24;
             _itemStore.add(itemToSell);
 
             var btnBuy = new FlxButton(0, 0, "", function(){

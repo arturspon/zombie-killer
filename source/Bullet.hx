@@ -3,7 +3,7 @@ package;
 import flixel.FlxSprite;
 
 class Bullet extends FlxSprite {
-    var bulletSize = 4;
+    var bulletSize = 2;
 
     public function new() {
         super();

@@ -120,7 +120,6 @@ class Survivor extends Entity {
                 
                 var bullet = _bullets.getFirstAvailable();
                 bullet.reset(x, y);
-                //bullet.angularVelocity = 1024;
                 bullet.velocity.x = _velocity.x;
                 bullet.velocity.y = _velocity.y;
 

@@ -895,9 +895,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","44");
+		_this.setReserved("build","45");
 	} else {
-		_this.h["build"] = "44";
+		_this.h["build"] = "45";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -6835,7 +6835,7 @@ flixel_FlxSprite.prototype = $extend(flixel_FlxObject.prototype,{
 	,__properties__: $extend(flixel_FlxObject.prototype.__properties__,{set_clipRect:"set_clipRect",set_color:"set_color",set_blend:"set_blend",set_flipY:"set_flipY",set_flipX:"set_flipX",set_facing:"set_facing",set_alpha:"set_alpha",set_graphic:"set_graphic",set_frames:"set_frames",set_frame:"set_frame",set_pixels:"set_pixels",get_pixels:"get_pixels",set_antialiasing:"set_antialiasing",set_useFramePixels:"set_useFramePixels"})
 });
 var Bullet = function() {
-	this.bulletSize = 4;
+	this.bulletSize = 2;
 	flixel_FlxSprite.call(this);
 	this.loadGraphic("assets/images/bullet.png",false,32,32);
 	this.setGraphicSize(this.bulletSize);
@@ -7917,6 +7917,8 @@ HUD.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 			var itemSpace = new flixel_FlxSprite().makeGraphic(flixel_FlxG.width,flixel_FlxG.height,0,true);
 			flixel_util_FlxSpriteUtil.drawRect(itemSpace,itemX,itemY,itemStoreSpaceSize,itemStoreSpaceSize,0,this.lineStyle);
 			this._itemStore.add(itemSpace);
+			var t = new flixel_FlxSprite((itemX + itemStoreSpaceSize) / 2,itemY);
+			this.add(t);
 			var itemToSell = new flixel_FlxSprite();
 			itemToSell.loadGraphic(this._itemSpriteMap.h[itemKey2[0]],false);
 			itemToSell.setGraphicSize(itemStoreSpaceSize - itemStoreSpacePadding);
@@ -8684,7 +8686,6 @@ $hxClasses["PlayState"] = PlayState;
 PlayState.__name__ = ["PlayState"];
 PlayState._hud = null;
 PlayState.ENEMIES_SPAWN_POINT_LIST = null;
-PlayState.SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP = null;
 PlayState.MAIL = null;
 PlayState.__super__ = flixel_FlxState;
 PlayState.prototype = $extend(flixel_FlxState.prototype,{
@@ -8702,9 +8703,6 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,create: function() {
 		PlayState.MAIL = new Mail();
 		PlayState.ENEMIES_SPAWN_POINT_LIST = [new lime_math_Vector2(-8,238),new lime_math_Vector2(flixel_FlxG.width,134),new lime_math_Vector2(flixel_FlxG.width,213),new lime_math_Vector2(475,flixel_FlxG.height)];
-		var _g = new haxe_ds_IntMap();
-		_g.h[4] = PlayState.ENEMIES_SPAWN_POINT_LIST[3];
-		PlayState.SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP = _g;
 		this._mapWalls = new flixel_tile_FlxTilemap();
 		this._mapWalls.loadMapFromCSV("assets/data/cave_walls.csv","assets/images/cave_tileset.png",16,16,null,0,1);
 		this.add(this._mapWalls);
@@ -78379,7 +78377,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 235553;
+	this.version = 495328;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = ["lime","utils","AssetCache"];
@@ -119977,6 +119975,7 @@ PlayState.SPECIAL_ENEMY_VELOCITY_IN_WAVE_MAP = (function($this) {
 	$r = _g;
 	return $r;
 }(this));
+PlayState.SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP = new haxe_ds_IntMap();
 PlayState.currentInventorySelectedItem = 0;
 PlayState.WEAPON_PISTOL = 0;
 PlayState.WEAPON_RIFLE = 1;

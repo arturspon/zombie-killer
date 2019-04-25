@@ -28,6 +28,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     var _inventoryItemSpritePadding = 8;
     var _inventoryRenderedItems:Array<Int> = new Array<Int>(); // Items that have already been rendered to HUD
     var _inventoryNumberTextList:Array<FlxText> = new Array<FlxText>();
+    //static var _CUSTOM_INVENTORY_SPRITE_SIZES:Map<
 
     // Item store
     var _itemStore:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
@@ -83,7 +84,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         // playerMoneyRounded:Float = FlxMath.roundDecimal(s.playerMoney, 2);
         _money.text = "$" + s.playerMoney;
 
-        var ammoForCurrentWeapon = _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem) == null ? 0 : _survivor._bulletsMap.get(PlayState.currentInventorySelectedItem);
+        var ammoForCurrentWeapon = _survivor.itemQtdMap.get(_survivor.inventoryList[PlayState.currentInventorySelectedItem]) == null ? 0 : _survivor.itemQtdMap.get(_survivor.inventoryList[PlayState.currentInventorySelectedItem]);
         if(ammoForCurrentWeapon <= 10) {
             _ammoForCurrentWeapon.color = FlxColor.RED;
         } else {
@@ -230,11 +231,13 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         var itemPrice = _storePriceMap.get(itemId);
         if((_survivor.money - itemPrice) >= 0) {
             _survivor.money -= itemPrice;
-            //PlayState.inventoryItemsList.push(itemId);
-            _survivor.inventoryList.push(itemId);
+            
+            if(_survivor.inventoryList.indexOf(itemId) < 0){
+                _survivor.inventoryList.push(itemId);
+            }            
 
-            var qtdToBuy =  _survivor._bulletsMap.get(itemId) == null ? _itemQtdToBuyMap.get(itemId) : (_itemQtdToBuyMap.get(itemId) + _survivor._bulletsMap.get(itemId));
-            _survivor._bulletsMap.set(itemId, qtdToBuy);
+            var qtdToBuy =  _survivor.itemQtdMap.get(itemId) == null ? _itemQtdToBuyMap.get(itemId) : (_itemQtdToBuyMap.get(itemId) + _survivor.itemQtdMap.get(itemId));
+            _survivor.itemQtdMap.set(itemId, qtdToBuy);
 
             updateInventory();
         }

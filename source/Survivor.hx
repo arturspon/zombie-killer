@@ -1,5 +1,6 @@
 package;
 
+import flixel.math.FlxMath;
 import haxe.ds.HashMap;
 import flixel.math.FlxAngle;
 import flixel.FlxG;
@@ -18,7 +19,7 @@ class Survivor extends Entity {
         PlayState.WEAPON_PISTOL => 1 / 7,
         PlayState.WEAPON_RIFLE => 1 / 11.1
     ];
-    public var _bulletsMap:Map<Int, Int> = [
+    public var itemQtdMap:Map<Int, Int> = [
         PlayState.WEAPON_PISTOL => 30
     ];
 
@@ -93,7 +94,7 @@ class Survivor extends Entity {
             shoot();
         }
         if(FlxG.mouse.pressed) {
-            if(PlayState.currentInventorySelectedItem == PlayState.WEAPON_RIFLE) shoot();
+            if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) shoot();
         }
 
         // Inventory
@@ -105,12 +106,16 @@ class Survivor extends Entity {
         if(HUD.isItemStoreOpen) return;
 
         if(inventoryList.indexOf(PlayState.currentInventorySelectedItem) >= 0) {
+            FlxG.log.add(PlayState.currentInventorySelectedItem);
+            FlxG.log.add(inventoryList[PlayState.currentInventorySelectedItem]);
+            FlxG.log.add(inventoryList);
+            FlxG.log.add("---");
             if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_PISTOL ||
                 inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) {
-                    if(_bulletsMap.get(PlayState.currentInventorySelectedItem) <= 0) return;
-                    _bulletsMap.set(PlayState.currentInventorySelectedItem, _bulletsMap.get(PlayState.currentInventorySelectedItem)-1);
+                    if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
+                    itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
 
-                    _shootTimer.start(FIRE_RATE_MAP.get(PlayState.currentInventorySelectedItem));
+                    _shootTimer.start(FIRE_RATE_MAP.get(inventoryList[PlayState.currentInventorySelectedItem]));
 
                     _velocity.x = FlxG.mouse.x - x;
                     _velocity.y = FlxG.mouse.y - y;
@@ -123,8 +128,21 @@ class Survivor extends Entity {
                     bullet.velocity.x = _velocity.x;
                     bullet.velocity.y = _velocity.y;
 
-                    _sndPistolShot.play(true);                
+                    _sndPistolShot.play(true);
+                    
+                    return;
                 }
+
+            if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.LAND_MINE) {
+                /*var maxDistanceToPlantTheMine = 32;
+                if((FlxG.mouse.x < (x + maxDistanceToPlantTheMine)) || (FlxG.mouse.x > (x - maxDistanceToPlantTheMine))
+                    || (FlxG.mouse.y < (y + maxDistanceToPlantTheMine)) || (FlxG.mouse.y > (y - maxDistanceToPlantTheMine))) {
+                }*/
+                if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
+                itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
+                FlxG.state.add(new LandMine(FlxG.mouse.x, FlxG.mouse.y));
+                return;
+            }
         }
     }
     

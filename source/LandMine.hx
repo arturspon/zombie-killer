@@ -7,6 +7,7 @@ import flixel.effects.particles.FlxEmitter.FlxTypedEmitter;
 
 class LandMine extends Entity {
     var _currentState:String = "armed";
+    var _explosionParticles = new FlxTypedEmitter(100, 100, 100);
     static var _DAMAGE:Float = 5;
 
     public function new(x:Int, y:Int) {
@@ -20,20 +21,21 @@ class LandMine extends Entity {
 
         animation.add("armed", [0, 1], 2, true);
         animation.play("armed");
-
-        //explode();
+        
+        _explosionParticles = new FlxTypedEmitter(x, y, 100);
+		_explosionParticles.makeParticles(2, 2, FlxColor.ORANGE, 200);
+        FlxG.state.add(_explosionParticles);
     }
 
     override public function update(elapsed:Float):Void	{
-        FlxG.overlap(this, PlayState.enemies, dealDamage);
+        FlxG.overlap(this, PlayState.enemies, explode);
+        FlxG.overlap(_explosionParticles, PlayState.enemies, dealDamage);
 		super.update(elapsed);
 	}
 
-    public function explode() {
-        var particles = new FlxTypedEmitter(100, 100, 100);
-		particles.makeParticles(2, 2, FlxColor.ORANGE, 200);
-        FlxG.state.add(particles);
-		particles.start();
+    public function explode(s1:FlxObject, s2:FlxObject) {
+		_explosionParticles.start();
+        alpha = 0;
     }
 
     public function dealDamage(s1:FlxObject, s2:FlxObject) {

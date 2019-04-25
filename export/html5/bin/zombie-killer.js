@@ -895,9 +895,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","41");
+		_this.setReserved("build","42");
 	} else {
-		_this.h["build"] = "41";
+		_this.h["build"] = "42";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -7659,8 +7659,15 @@ Enemy.prototype = $extend(Entity.prototype,{
 	}
 	,onMessage: function(m) {
 		if(m.op == 0) {
-			this.hurt(m.data);
+			if(this.alive) {
+				this.hurt(m.data);
+				if(!this.alive) {
+					PlayState.enemiesKilledInCurrentWave++;
+				}
+			}
 		}
+	}
+	,showHealthBar: function() {
 	}
 	,setHealthByWave: function(wave) {
 		this.health = 2 + wave;
@@ -7750,8 +7757,12 @@ var HUD = function(survivor) {
 	this.lineStyle = { color : -8355712, thickness : 1};
 	flixel_group_FlxTypedGroup.call(this);
 	this._survivor = survivor;
-	this._health = new flixel_text_FlxText(5,5,0,"Health: ",16);
-	this._ammoForCurrentWeapon = new flixel_text_FlxText(5,this._health.y + this._health.get_height() + 8,0,"Ammo: ",16);
+	this._healthBar = new flixel_ui_FlxBar(5,12);
+	this._healthBar.parent = this._survivor;
+	this._healthBar.parentVariable = "health";
+	this._healthBar.setRange(0,10);
+	this._healthBar.createColoredFilledBar(-65536,true,-6750208);
+	this._ammoForCurrentWeapon = new flixel_text_FlxText(5,this._healthBar.y + this._healthBar.get_height() + 8,0,"Ammo: ",16);
 	this._money = new flixel_text_FlxText(5,this._ammoForCurrentWeapon.y + this._ammoForCurrentWeapon.get_height() + 8,0,"$0",16);
 	this._wave = new flixel_text_FlxText(0,5,0,"Wave A",16);
 	this._wave.set_x(flixel_FlxG.width - this._wave.get_width() - 5);
@@ -7762,7 +7773,7 @@ var HUD = function(survivor) {
 	this.inventoryBarTotalWidth = this.inventorySpaceSquareSize * this.inventorySpaces;
 	this.drawInventorySpaces();
 	this.updateInventory();
-	this.add(this._health);
+	this.add(this._healthBar);
 	this.add(this._ammoForCurrentWeapon);
 	this.add(this._money);
 	this.add(this._wave);
@@ -7773,7 +7784,7 @@ HUD.__name__ = ["HUD"];
 HUD.__super__ = flixel_group_FlxTypedGroup;
 HUD.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 	_survivor: null
-	,_health: null
+	,_healthBar: null
 	,_ammoForCurrentWeapon: null
 	,_money: null
 	,_wave: null
@@ -7792,7 +7803,6 @@ HUD.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 	,_itemQtdToBuyMap: null
 	,update: function(elapsed) {
 		var s = flixel_FlxG.game._state;
-		this._health.set_text("Health: " + s.playerHealth);
 		this._wave.set_text("Wave " + (s.currentWave + 1));
 		this._money.set_text("$" + s.playerMoney);
 		var ammoForCurrentWeapon = this._survivor.itemQtdMap.h[this._survivor.inventoryList[PlayState.currentInventorySelectedItem]] == null ? 0 : this._survivor.itemQtdMap.h[this._survivor.inventoryList[PlayState.currentInventorySelectedItem]];
@@ -7845,7 +7855,7 @@ HUD.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 				s.setGraphicSize(32);
 				s.updateHitbox();
 				flixel_util_FlxSpriteUtil.updateSpriteGraphic(s);
-				s.set_angle(-32);
+				s.set_angle(HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[item] == null ? 0 : HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[item]);
 				s.set_x(flixel_FlxG.width / 2 - this.inventoryBarTotalWidth / 2 + this.inventorySpaceSquareSize * this._inventoryRenderedItems.length);
 				this.add(s);
 				this._inventoryRenderedItems.push(item);
@@ -7903,8 +7913,10 @@ HUD.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 			var itemToSell = new flixel_FlxSprite();
 			itemToSell.loadGraphic(this._itemSpriteMap.h[itemKey2[0]],false);
 			itemToSell.setGraphicSize(itemStoreSpaceSize - itemStoreSpacePadding);
-			itemToSell.set_angle(-24);
-			itemToSell.set_x(itemX + itemToSell.get_width() / 2);
+			flixel_util_FlxSpriteUtil.updateSpriteGraphic(itemToSell);
+			itemToSell.updateFramePixels();
+			itemToSell.set_angle(HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[itemKey2[0]] == null ? 0 : HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[itemKey2[0]]);
+			itemToSell.set_x(itemX);
 			itemToSell.set_y(itemY + 32);
 			this._itemStore.add(itemToSell);
 			var btnBuy = new flixel_ui_FlxButton(0,0,"",(function(itemKey3) {
@@ -8039,7 +8051,6 @@ Lambda.array = function(it) {
 	return a;
 };
 var LandMine = function(x,y) {
-	this._explosionParticles = new flixel_effects_particles_FlxTypedEmitter(100,100,100);
 	this._currentState = "armed";
 	Entity.call(this,x,y);
 	this.loadGraphic("assets/images/land_mine.png",true,32,32);
@@ -8049,6 +8060,11 @@ var LandMine = function(x,y) {
 	this.animation.add("armed",[0,1],2,true);
 	this.animation.play("armed");
 	this._explosionParticles = new flixel_effects_particles_FlxTypedEmitter(x,y,100);
+	this._explosionParticles.lifespan.set(1,3);
+	this._explosionParticles.color.set(-1,-23296,-65536);
+	this._explosionParticles.set_solid(true);
+	this._explosionParticles.alpha.set(1,1,0,0);
+	this._explosionParticles.launchMode = flixel_effects_particles_FlxEmitterMode.CIRCLE;
 	this._explosionParticles.makeParticles(2,2,-23296,200);
 	flixel_FlxG.game._state.add(this._explosionParticles);
 };
@@ -8060,7 +8076,7 @@ LandMine.prototype = $extend(Entity.prototype,{
 	,_explosionParticles: null
 	,update: function(elapsed) {
 		flixel_FlxG.overlap(this,PlayState.enemies,$bind(this,this.explode));
-		flixel_FlxG.overlap(this._explosionParticles,PlayState.enemies,$bind(this,this.dealDamage),flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this._explosionParticles,PlayState.enemies,$bind(this,this.dealDamage));
 		if(this._currentState != "armed" && !this._explosionParticles.emitting) {
 			this.kill();
 		}
@@ -8070,11 +8086,6 @@ LandMine.prototype = $extend(Entity.prototype,{
 		if(this._currentState == "armed") {
 			this._currentState = "exploding";
 			this._explosionParticles.start(true,0.01,0);
-			this._explosionParticles.lifespan.set(1,3);
-			this._explosionParticles.color.set(-1,-23296,-65536);
-			this._explosionParticles.set_solid(true);
-			this._explosionParticles.alpha.set(1,1,0,0);
-			this._explosionParticles.launchMode = flixel_effects_particles_FlxEmitterMode.CIRCLE;
 		}
 		this.set_alpha(0);
 	}
@@ -8163,7 +8174,7 @@ ManifestResources.init = function(config) {
 	var data;
 	var manifest;
 	var library;
-	data = "{\"name\":null,\"assets\":\"aoy4:pathy25:assets%2Fdata%2Fcave.jsony4:sizei12760y4:typey4:TEXTy2:idR1y7:preloadtgoR0y31:assets%2Fdata%2Fcave_ground.csvR2i3994R3R4R5R7R6tgoR0y30:assets%2Fdata%2Fcave_walls.csvR2i3835R3R4R5R8R6tgoR0y28:assets%2Fimages%2Fbullet.pngR2i660R3y5:IMAGER5R9R6tgoR0y34:assets%2Fimages%2Fcave_tileset.pngR2i44054R3R10R5R11R6tgoR0y35:assets%2Fimages%2Fdungeon_tiles.pngR2i20013R3R10R5R12R6tgoR0y31:assets%2Fimages%2Fland_mine.pngR2i657R3R10R5R13R6tgoR0y36:assets%2Fimages%2Fland_mine_icon.pngR2i2031R3R10R5R14R6tgoR0y41:assets%2Fimages%2Fsurvivor%2Fsurvivor.pngR2i2037091R3R10R5R15R6tgoR0y54:assets%2Fimages%2Fsurvivor%2Fsurvivor_idle_handgun.pngR2i429494R3R10R5R16R6tgoR0y54:assets%2Fimages%2Fsurvivor%2Fsurvivor_move_handgun.pngR2i434396R3R10R5R17R6tgoR0y55:assets%2Fimages%2Fsurvivor%2Fsurvivor_shoot_handgun.pngR2i89875R3R10R5R18R6tgoR0y35:assets%2Fimages%2Fweapons%2FBAR.pngR2i500R3R10R5R19R6tgoR0y39:assets%2Fimages%2Fweapons%2FBazooka.pngR2i510R3R10R5R20R6tgoR0y42:assets%2Fimages%2Fweapons%2FBren%20LMG.pngR2i672R3R10R5R21R6tgoR0y44:assets%2Fimages%2Fweapons%2FColt%20M1911.pngR2i518R3R10R5R22R6tgoR0y39:assets%2Fimages%2Fweapons%2FDP%2028.pngR2i546R3R10R5R23R6tgoR0y49:assets%2Fimages%2Fweapons%2FEnfield%20No.%202.pngR2i419R3R10R5R24R6tgoR0y43:assets%2Fimages%2Fweapons%2FGewehr%2043.pngR2i455R3R10R5R25R6tgoR0y47:assets%2Fimages%2Fweapons%2FKarabiner%2098k.pngR2i454R3R10R5R26R6tgoR0y43:assets%2Fimages%2Fweapons%2FM1%20Garand.pngR2i458R3R10R5R27R6tgoR0y39:assets%2Fimages%2Fweapons%2FMG%2042.pngR2i673R3R10R5R28R6tgoR0y48:assets%2Fimages%2Fweapons%2FMk%202%20grenade.pngR2i554R3R10R5R29R6tgoR0y46:assets%2Fimages%2Fweapons%2FMosin%20Nagant.pngR2i486R3R10R5R30R6tgoR0y39:assets%2Fimages%2Fweapons%2FMP%2040.pngR2i520R3R10R5R31R6tgoR0y45:assets%2Fimages%2Fweapons%2FPanzerschreck.pngR2i486R3R10R5R32R6tgoR0y41:assets%2Fimages%2Fweapons%2FPPSh%2041.pngR2i445R3R10R5R33R6tgoR0y51:assets%2Fimages%2Fweapons%2FSpringfield%20M1903.pngR2i437R3R10R5R34R6tgoR0y36:assets%2Fimages%2Fweapons%2FSten.pngR2i453R3R10R5R35R6tgoR0y38:assets%2Fimages%2Fweapons%2FStG_44.pngR2i789R3R10R5R36R6tgoR0y47:assets%2Fimages%2Fweapons%2FStick%20grenade.pngR2i301R3R10R5R37R6tgoR0y38:assets%2Fimages%2Fweapons%2FSVT-40.pngR2i508R3R10R5R38R6tgoR0y40:assets%2Fimages%2Fweapons%2FThompson.pngR2i519R3R10R5R39R6tgoR0y45:assets%2Fimages%2Fweapons%2FTokarev_TT-33.pngR2i454R3R10R5R40R6tgoR0y51:assets%2Fimages%2Fweapons%2FType%2097%20grenade.pngR2i396R3R10R5R41R6tgoR0y51:assets%2Fimages%2Fweapons%2FType%2099%20Arisaka.pngR2i460R3R10R5R42R6tgoR0y47:assets%2Fimages%2Fweapons%2FType%2099%20LMG.pngR2i799R3R10R5R43R6tgoR0y45:assets%2Fimages%2Fweapons%2FWalther%20P38.pngR2i440R3R10R5R44R6tgoR0y45:assets%2Fimages%2Fzombie%2Fzombie_running.pngR2i617531R3R10R5R45R6tgoR0y36:assets%2Fmusic%2Fmusic-goes-here.txtR2zR3R4R5R46R6tgoR2i713270R3y5:SOUNDR5y33:assets%2Fsounds%2Fpistol_shot.wavy9:pathGroupaR48hR6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R50R6tgoR2i2114R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3R49aR52y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R51R5y28:flixel%2Fsounds%2Fflixel.mp3R49aR54y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i5794R3R47R5R53R49aR52R53hgoR2i33629R3R47R5R55R49aR54R55hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R56R57y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i519R3R10R5R62R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i3280R3R10R5R63R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
+	data = "{\"name\":null,\"assets\":\"aoy4:pathy25:assets%2Fdata%2Fcave.jsony4:sizei12760y4:typey4:TEXTy2:idR1y7:preloadtgoR0y31:assets%2Fdata%2Fcave_ground.csvR2i3994R3R4R5R7R6tgoR0y30:assets%2Fdata%2Fcave_walls.csvR2i3835R3R4R5R8R6tgoR0y28:assets%2Fimages%2Fbullet.pngR2i660R3y5:IMAGER5R9R6tgoR0y33:assets%2Fimages%2Fbullet_icon.pngR2i9545R3R10R5R11R6tgoR0y34:assets%2Fimages%2Fbullet_icon1.pngR2i1892R3R10R5R12R6tgoR0y34:assets%2Fimages%2Fcave_tileset.pngR2i44054R3R10R5R13R6tgoR0y35:assets%2Fimages%2Fdungeon_tiles.pngR2i20013R3R10R5R14R6tgoR0y31:assets%2Fimages%2Fland_mine.pngR2i657R3R10R5R15R6tgoR0y36:assets%2Fimages%2Fland_mine_icon.pngR2i2031R3R10R5R16R6tgoR0y34:assets%2Fimages%2Fsimple_heart.pngR2i249R3R10R5R17R6tgoR0y41:assets%2Fimages%2Fsurvivor%2Fsurvivor.pngR2i2037091R3R10R5R18R6tgoR0y54:assets%2Fimages%2Fsurvivor%2Fsurvivor_idle_handgun.pngR2i429494R3R10R5R19R6tgoR0y54:assets%2Fimages%2Fsurvivor%2Fsurvivor_move_handgun.pngR2i434396R3R10R5R20R6tgoR0y55:assets%2Fimages%2Fsurvivor%2Fsurvivor_shoot_handgun.pngR2i89875R3R10R5R21R6tgoR0y35:assets%2Fimages%2Fweapons%2FBAR.pngR2i500R3R10R5R22R6tgoR0y39:assets%2Fimages%2Fweapons%2FBazooka.pngR2i510R3R10R5R23R6tgoR0y42:assets%2Fimages%2Fweapons%2FBren%20LMG.pngR2i672R3R10R5R24R6tgoR0y44:assets%2Fimages%2Fweapons%2FColt%20M1911.pngR2i518R3R10R5R25R6tgoR0y39:assets%2Fimages%2Fweapons%2FDP%2028.pngR2i546R3R10R5R26R6tgoR0y49:assets%2Fimages%2Fweapons%2FEnfield%20No.%202.pngR2i419R3R10R5R27R6tgoR0y43:assets%2Fimages%2Fweapons%2FGewehr%2043.pngR2i455R3R10R5R28R6tgoR0y47:assets%2Fimages%2Fweapons%2FKarabiner%2098k.pngR2i454R3R10R5R29R6tgoR0y43:assets%2Fimages%2Fweapons%2FM1%20Garand.pngR2i458R3R10R5R30R6tgoR0y39:assets%2Fimages%2Fweapons%2FMG%2042.pngR2i673R3R10R5R31R6tgoR0y48:assets%2Fimages%2Fweapons%2FMk%202%20grenade.pngR2i554R3R10R5R32R6tgoR0y46:assets%2Fimages%2Fweapons%2FMosin%20Nagant.pngR2i486R3R10R5R33R6tgoR0y39:assets%2Fimages%2Fweapons%2FMP%2040.pngR2i520R3R10R5R34R6tgoR0y45:assets%2Fimages%2Fweapons%2FPanzerschreck.pngR2i486R3R10R5R35R6tgoR0y41:assets%2Fimages%2Fweapons%2FPPSh%2041.pngR2i445R3R10R5R36R6tgoR0y51:assets%2Fimages%2Fweapons%2FSpringfield%20M1903.pngR2i437R3R10R5R37R6tgoR0y36:assets%2Fimages%2Fweapons%2FSten.pngR2i453R3R10R5R38R6tgoR0y38:assets%2Fimages%2Fweapons%2FStG_44.pngR2i789R3R10R5R39R6tgoR0y47:assets%2Fimages%2Fweapons%2FStick%20grenade.pngR2i301R3R10R5R40R6tgoR0y38:assets%2Fimages%2Fweapons%2FSVT-40.pngR2i508R3R10R5R41R6tgoR0y40:assets%2Fimages%2Fweapons%2FThompson.pngR2i519R3R10R5R42R6tgoR0y45:assets%2Fimages%2Fweapons%2FTokarev_TT-33.pngR2i454R3R10R5R43R6tgoR0y51:assets%2Fimages%2Fweapons%2FType%2097%20grenade.pngR2i396R3R10R5R44R6tgoR0y51:assets%2Fimages%2Fweapons%2FType%2099%20Arisaka.pngR2i460R3R10R5R45R6tgoR0y47:assets%2Fimages%2Fweapons%2FType%2099%20LMG.pngR2i799R3R10R5R46R6tgoR0y45:assets%2Fimages%2Fweapons%2FWalther%20P38.pngR2i440R3R10R5R47R6tgoR0y45:assets%2Fimages%2Fzombie%2Fzombie_running.pngR2i617531R3R10R5R48R6tgoR0y36:assets%2Fmusic%2Fmusic-goes-here.txtR2zR3R4R5R49R6tgoR2i713270R3y5:SOUNDR5y33:assets%2Fsounds%2Fpistol_shot.wavy9:pathGroupaR51hR6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R53R6tgoR2i2114R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3R52aR55y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R54R5y28:flixel%2Fsounds%2Fflixel.mp3R52aR57y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i5794R3R50R5R56R52aR55R56hgoR2i33629R3R50R5R58R52aR57R58hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R59R60y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i519R3R10R5R65R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i3280R3R10R5R66R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
 	manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
 	library = lime_utils_AssetLibrary.fromManifest(manifest);
 	lime_utils_Assets.registerLibrary("default",library);
@@ -8660,7 +8671,6 @@ var PlayState = function(MaxSize) {
 	this._random = new flixel_math_FlxRandom();
 	this.secondsRemainingUntilNextWave = 0;
 	this.currentWave = 0;
-	this._enemies_killed_in_this_wave = 0;
 	this._bullets = new flixel_group_FlxTypedGroup();
 	flixel_FlxState.call(this,MaxSize);
 };
@@ -8674,7 +8684,6 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	_survivor: null
 	,_bullets: null
 	,_enemies_in_this_wave: null
-	,_enemies_killed_in_this_wave: null
 	,playerHealth: null
 	,playerMoney: null
 	,currentWave: null
@@ -8719,8 +8728,8 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	}
 	,checkIfWaveIsOver: function() {
 		var _gthis = this;
-		if(this._enemies_in_this_wave == this._enemies_killed_in_this_wave) {
-			this._enemies_killed_in_this_wave = 0;
+		if(this._enemies_in_this_wave == PlayState.enemiesKilledInCurrentWave) {
+			PlayState.enemiesKilledInCurrentWave = 0;
 			this.currentWave++;
 			this.populateWave();
 			var timeUntilNextWave = PlayState.SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP.h[this.currentWave] == null ? 5 : PlayState.SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP.h[this.currentWave];
@@ -8772,8 +8781,8 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 			s1.kill();
 			s2.hurt(1);
 			if(!s2.alive) {
-				this._enemies_killed_in_this_wave++;
-				this._survivor.money += flixel_math_FlxMath.roundDecimal(this._random["float"](0.2,1.2),2);
+				PlayState.enemiesKilledInCurrentWave++;
+				this._survivor.money += this._random["int"](50,300);
 			}
 		}
 	}
@@ -9187,7 +9196,7 @@ StringTools.quoteWinArg = function(argument,escapeMetaCharacters) {
 };
 var Survivor = function(x,y,bullets) {
 	this.inventoryList = [0];
-	this.money = 20000.0;
+	this.money = 2000.0;
 	var _g = new haxe_ds_IntMap();
 	_g.h[0] = 30;
 	this.itemQtdMap = _g;
@@ -9207,6 +9216,8 @@ var Survivor = function(x,y,bullets) {
 	this._sndPistolShot = flixel_FlxG.sound.load("assets/sounds/pistol_shot.wav");
 	this._velocity.set_x(0);
 	this._velocity.set_y(0);
+	this.givePistolAmmoPeriodically();
+	this.restoreHealthPeriodically();
 };
 $hxClasses["Survivor"] = Survivor;
 Survivor.__name__ = ["Survivor"];
@@ -9305,7 +9316,6 @@ Survivor.prototype = $extend(Entity.prototype,{
 			return;
 		}
 		if(this.inventoryList[PlayState.currentInventorySelectedItem] == 0 || this.inventoryList[PlayState.currentInventorySelectedItem] == 1) {
-			flixel_FlxG.log.advanced("tchau",flixel_system_debug_log_LogStyle.NORMAL);
 			if(this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] <= 0) {
 				return;
 			}
@@ -9329,7 +9339,6 @@ Survivor.prototype = $extend(Entity.prototype,{
 			}
 			this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] = this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] - 1;
 			flixel_FlxG.game._state.add(new LandMine(flixel_FlxG.mouse.x,flixel_FlxG.mouse.y));
-			flixel_FlxG.log.advanced("oi2",flixel_system_debug_log_LogStyle.NORMAL);
 			return;
 		}
 	}
@@ -9359,6 +9368,22 @@ Survivor.prototype = $extend(Entity.prototype,{
 			PlayState.currentInventorySelectedItem = 4;
 			PlayState._hud.updateInventory();
 		}
+	}
+	,givePistolAmmoPeriodically: function() {
+		var _gthis = this;
+		new flixel_util_FlxTimer().start(1.5,function(deltaTime) {
+			if(_gthis.itemQtdMap.h[0] < 30 && _gthis.alive) {
+				_gthis.itemQtdMap.h[0] = _gthis.itemQtdMap.h[0] + 1;
+			}
+		},0);
+	}
+	,restoreHealthPeriodically: function() {
+		var _gthis = this;
+		new flixel_util_FlxTimer().start(5,function(deltaTime) {
+			if(_gthis.health < 10 && _gthis.alive) {
+				_gthis.health++;
+			}
+		},0);
 	}
 	,__class__: Survivor
 });
@@ -78346,7 +78371,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 371087;
+	this.version = 864534;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = ["lime","utils","AssetCache"];
@@ -119832,10 +119857,13 @@ AssetPaths.cave__json = "assets/data/cave.json";
 AssetPaths.cave_ground__csv = "assets/data/cave_ground.csv";
 AssetPaths.cave_walls__csv = "assets/data/cave_walls.csv";
 AssetPaths.bullet__png = "assets/images/bullet.png";
+AssetPaths.bullet_icon__png = "assets/images/bullet_icon.png";
+AssetPaths.bullet_icon1__png = "assets/images/bullet_icon1.png";
 AssetPaths.cave_tileset__png = "assets/images/cave_tileset.png";
 AssetPaths.dungeon_tiles__png = "assets/images/dungeon_tiles.png";
 AssetPaths.land_mine__png = "assets/images/land_mine.png";
 AssetPaths.land_mine_icon__png = "assets/images/land_mine_icon.png";
+AssetPaths.simple_heart__png = "assets/images/simple_heart.png";
 AssetPaths.survivor__png = "assets/images/survivor/survivor.png";
 AssetPaths.survivor_idle_handgun__png = "assets/images/survivor/survivor_idle_handgun.png";
 AssetPaths.survivor_move_handgun__png = "assets/images/survivor/survivor_move_handgun.png";
@@ -119891,6 +119919,14 @@ flixel_FlxObject._secondSeparateFlxRect = (function($this) {
 	return $r;
 }(this));
 Enemy.ATTACK_TIME_INTERVAL = 1;
+HUD._CUSTOM_INVENTORY_SPRITE_ANGLES = (function($this) {
+	var $r;
+	var _g = new haxe_ds_IntMap();
+	_g.h[1] = -32;
+	_g.h[0] = -32;
+	$r = _g;
+	return $r;
+}(this));
 HUD.isItemStoreOpen = false;
 LandMine._DAMAGE = 5;
 openfl_text_Font.__fontByName = new haxe_ds_StringMap();
@@ -119898,6 +119934,7 @@ openfl_text_Font.__registeredFonts = [];
 Message.OP_DAMAGE = 0;
 Message.OP_HEAL = 1;
 Message.OP_COLLISION = 2;
+PlayState.enemiesKilledInCurrentWave = 0;
 PlayState.enemies = new flixel_group_FlxTypedGroup();
 PlayState.SURVIVOR_SPAWN_POINT = new lime_math_Vector2(317,89);
 PlayState.SPAWN_FREQUENCY_BY_WAVE_MAP = (function($this) {

@@ -1,9 +1,7 @@
 package;
 
-import flixel.util.FlxColor;
 import flixel.util.FlxPath;
 import flixel.math.FlxPoint;
-import haxe.ds.HashMap;
 import flixel.math.FlxMath;
 import lime.math.Vector2;
 import flixel.FlxObject;
@@ -13,14 +11,13 @@ import flixel.FlxState;
 import flixel.group.FlxGroup;
 import flixel.math.FlxRandom;
 import flixel.tile.FlxTilemap;
-import flixel.effects.particles.FlxEmitter;
 
 class PlayState extends FlxState {
 	public static var _hud:HUD;
 	var _survivor:Survivor;
     var _bullets:FlxTypedGroup<Bullet> = new FlxTypedGroup<Bullet>();
 	var _enemies_in_this_wave:Int;
-	var _enemies_killed_in_this_wave:Int = 0;
+	public static var enemiesKilledInCurrentWave:Int = 0;
     public static var enemies:FlxTypedGroup<Enemy> = new FlxTypedGroup<Enemy>();
 
 	public var playerHealth:Float;
@@ -114,8 +111,8 @@ class PlayState extends FlxState {
 	}
 
 	function checkIfWaveIsOver() {
-		if(_enemies_in_this_wave == _enemies_killed_in_this_wave) {
-			_enemies_killed_in_this_wave = 0;
+		if(_enemies_in_this_wave == enemiesKilledInCurrentWave) {
+			enemiesKilledInCurrentWave = 0;
 			currentWave++;
 			populateWave();
 
@@ -170,8 +167,8 @@ class PlayState extends FlxState {
 			s1.kill();
 			s2.hurt(1);
 			if(!s2.alive){
-				_enemies_killed_in_this_wave++;
-				_survivor.money += FlxMath.roundDecimal(_random.float(0.2, 1.2), 2);
+				enemiesKilledInCurrentWave++;
+				_survivor.money += _random.int(50, 300);
 			}
 		}
 	}

@@ -8,11 +8,12 @@ import flixel.FlxG;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 using flixel.util.FlxSpriteUtil;
+import flixel.ui.FlxBar;
 
 class HUD extends FlxTypedGroup<FlxSprite> {
     var _survivor:Survivor;
 
-    var _health:FlxText;
+    var _healthBar:FlxBar;
     var _ammoForCurrentWeapon:FlxText;
     var _money:FlxText;
     var _wave:FlxText;
@@ -28,7 +29,10 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     var _inventoryItemSpritePadding = 8;
     var _inventoryRenderedItems:Array<Int> = new Array<Int>(); // Items that have already been rendered to HUD
     var _inventoryNumberTextList:Array<FlxText> = new Array<FlxText>();
-    //static var _CUSTOM_INVENTORY_SPRITE_SIZES:Map<
+    static var _CUSTOM_INVENTORY_SPRITE_ANGLES:Map<Int, Int> = [
+        PlayState.WEAPON_RIFLE => -32,        
+        PlayState.WEAPON_PISTOL => -32
+    ];
 
     // Item store
     var _itemStore:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
@@ -52,8 +56,13 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
         _survivor = survivor;
 
-        _health = new FlxText(5, 5, 0, "Health: ", 16);
-        _ammoForCurrentWeapon = new FlxText(5, _health.y + _health.height + 8, 0, "Ammo: ", 16);
+        _healthBar = new FlxBar(5, 12);
+        _healthBar.parent = _survivor;
+        _healthBar.parentVariable = "health";
+        _healthBar.setRange(0, 10);
+        _healthBar.createColoredFilledBar(0xffff0000, true, 0xff990000);
+
+        _ammoForCurrentWeapon = new FlxText(5, _healthBar.y + _healthBar.height + 8, 0, "Ammo: ", 16);
         _money = new FlxText(5, _ammoForCurrentWeapon.y + _ammoForCurrentWeapon.height + 8, 0, "$0", 16);
 
         _wave = new FlxText(0, 5, 0, "Wave A", 16);
@@ -69,7 +78,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         drawInventorySpaces();
         updateInventory();
 
-        add(_health);
+        add(_healthBar);
         add(_ammoForCurrentWeapon);
         add(_money);
         add(_wave);
@@ -78,7 +87,6 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
     override public function update(elapsed:Float):Void {
         var s:PlayState = cast FlxG.state;
-        _health.text = "Health: " + s.playerHealth;
         _wave.text = "Wave " + (s.currentWave + 1);
 
         // playerMoneyRounded:Float = FlxMath.roundDecimal(s.playerMoney, 2);
@@ -128,14 +136,14 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         for(item in _survivor.inventoryList) {
             if(_inventoryRenderedItems.indexOf(item) < 0) {
                 var xPositionToRenderItem = (FlxG.width / 2 - inventoryBarTotalWidth / 2) + inventorySpaceSquareSize * _inventoryRenderedItems.length;
-
+                
                 var s = new FlxSprite(xPositionToRenderItem, inventorySpaceSquareSize / 2 - 4);
                 s.loadGraphic(_itemSpriteMap.get(item), false);
                 
                 s.setGraphicSize(32);
                 s.updateHitbox();
                 s.updateSpriteGraphic();
-                s.angle = -32;
+                s.angle = (_CUSTOM_INVENTORY_SPRITE_ANGLES.get(item) == null ? 0 : _CUSTOM_INVENTORY_SPRITE_ANGLES.get(item));
                 s.x = ((FlxG.width / 2 - inventoryBarTotalWidth / 2) + inventorySpaceSquareSize * _inventoryRenderedItems.length);
                 add(s);
                 _inventoryRenderedItems.push(item);
@@ -198,7 +206,9 @@ class HUD extends FlxTypedGroup<FlxSprite> {
             var itemToSell = new FlxSprite();
             itemToSell.loadGraphic(_itemSpriteMap.get(itemKey), false);                       
             itemToSell.setGraphicSize(itemStoreSpaceSize - itemStoreSpacePadding);
-            itemToSell.angle = -24;
+            itemToSell.updateSpriteGraphic();
+            itemToSell.updateFramePixels();
+            itemToSell.angle = (_CUSTOM_INVENTORY_SPRITE_ANGLES.get(itemKey) == null ? 0 : _CUSTOM_INVENTORY_SPRITE_ANGLES.get(itemKey));                
             itemToSell.x = itemX + itemToSell.width / 2;
             itemToSell.y = itemY + 32;
             _itemStore.add(itemToSell);

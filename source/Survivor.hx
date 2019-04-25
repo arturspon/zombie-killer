@@ -1,7 +1,5 @@
 package;
 
-import flixel.math.FlxMath;
-import haxe.ds.HashMap;
 import flixel.math.FlxAngle;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
@@ -24,7 +22,7 @@ class Survivor extends Entity {
     ];
 
     // Inventory
-    public var money:Float = 20000.0;
+    public var money:Float = 2000.0;
     public var inventoryList:Array<Int> = [PlayState.WEAPON_PISTOL];    
     
 	 // Sound effects
@@ -50,6 +48,9 @@ class Survivor extends Entity {
 
         _velocity.x = 0;
         _velocity.y = 0;
+
+        givePistolAmmoPeriodically();
+        restoreHealthPeriodically();
     }
 
     override public function update(elapsed:Float):Void	{
@@ -107,7 +108,6 @@ class Survivor extends Entity {
         
         if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_PISTOL ||
             inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) {
-            FlxG.log.add("tchau");
                 if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
                 itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
 
@@ -138,7 +138,6 @@ class Survivor extends Entity {
             if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
             itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
             FlxG.state.add(new LandMine(FlxG.mouse.x, FlxG.mouse.y));
-            FlxG.log.add("oi2");
             return;
         }
     }
@@ -164,5 +163,19 @@ class Survivor extends Entity {
             PlayState.currentInventorySelectedItem = 4;
             PlayState._hud.updateInventory();
         }
+    }
+
+    function givePistolAmmoPeriodically() {
+		new FlxTimer().start(1.5, function(deltaTime:FlxTimer){
+            if(itemQtdMap.get(PlayState.WEAPON_PISTOL) < 30 && alive){
+                itemQtdMap.set(PlayState.WEAPON_PISTOL, itemQtdMap.get(PlayState.WEAPON_PISTOL) + 1);
+            }
+        }, 0);
+    }
+
+    function restoreHealthPeriodically() {
+		new FlxTimer().start(5, function(deltaTime:FlxTimer){
+            if(health < 10 && alive) health++;
+        }, 0);
     }
 }

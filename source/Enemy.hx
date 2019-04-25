@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxG;
 import flixel.util.FlxPath;
 import flixel.math.FlxRandom;
 import flixel.math.FlxPoint;
@@ -42,9 +43,21 @@ class Enemy extends Entity {
 
     override public function onMessage(m:Message):Void {
         if(m.op == Message.OP_DAMAGE){
-            hurt(m.data);
+            if(alive) {
+                hurt(m.data);
+                if(!alive) PlayState.enemiesKilledInCurrentWave++;
+            }
         }
     }
+
+    public function showHealthBar() {
+        //healthBar.revive();
+    }
+
+    /*function setWave(wave:Int) {
+        setHealthByWave(wave);
+        setRandomVelocityVariedByWave(wave);
+    }*/
 
     function setHealthByWave(wave:Int) {
         health = 2 + wave;

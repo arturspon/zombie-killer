@@ -34,7 +34,7 @@ class LandMine extends Entity {
 
     override public function update(elapsed:Float):Void	{
         FlxG.overlap(this, PlayState.enemies, explode);
-        FlxG.collide(_explosionParticles, PlayState.enemies, dealDamage);
+        FlxG.overlap(_explosionParticles, PlayState.enemies, dealDamage);
 
         if(_currentState != "armed" && !_explosionParticles.emitting) kill();
 

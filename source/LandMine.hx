@@ -8,7 +8,7 @@ import flixel.effects.particles.FlxEmitter;
 class LandMine extends Entity {
     var _currentState:String = "armed";
     var _explosionParticles:FlxEmitter;
-    static var _DAMAGE:Float = 5;
+    static var _DAMAGE:Float = 16;
 
     public function new(x:Int, y:Int) {
         super(x, y);
@@ -36,7 +36,7 @@ class LandMine extends Entity {
         FlxG.overlap(this, PlayState.enemies, explode);
         FlxG.overlap(_explosionParticles, PlayState.enemies, dealDamage);
 
-        if(_currentState != "armed" && !_explosionParticles.emitting) kill();
+        if(_currentState != "armed" && !_explosionParticles.emitting) //kill();
 
 		super.update(elapsed);
 	}
@@ -44,7 +44,7 @@ class LandMine extends Entity {
     public function explode(s1:FlxObject, s2:FlxObject) {
         if(_currentState == "armed") {
             _currentState = "exploding";
-            _explosionParticles.start(true, 0.01, 0);
+            _explosionParticles.start();
         }
         alpha = 0;
     }

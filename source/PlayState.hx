@@ -36,14 +36,18 @@ class PlayState extends FlxState {
 		1 => 0.9,
 		2 => 0.7,
 		3 => 0.5,
-		4 => 0.1
+		4 => 0.25
 	];
 	static var SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP:Map<Int, Int> = [ // If the requested key is null, the number of enemies vary by wave.
-		4 => 25
+		4 => 32
 	];
 	static var SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP:Map<Int, Int> = [ // If the requested key is null, them time is 5 seconds.
-		4 => 15
+		4 => 10
 	];
+	public static var SPECIAL_ENEMY_VELOCITY_IN_WAVE_MAP:Map<Int, Int> = [ // If the requested key is null, them time is 5 seconds.
+		4 => 50
+	];
+	static var SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP:Map<Int, Vector2>;
 	public var secondsRemainingUntilNextWave:Int = 0;
 
 	// Player's inventory
@@ -69,6 +73,9 @@ class PlayState extends FlxState {
 
 		// Spawn points
 		ENEMIES_SPAWN_POINT_LIST = [new Vector2(-8, 238), new Vector2(FlxG.width, 134), new Vector2(FlxG.width, 213), new Vector2(475, FlxG.height)];
+		/*SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP = [
+			4 => ENEMIES_SPAWN_POINT_LIST[3]
+		];*/
 
 		_mapWalls = new FlxTilemap();
 		_mapWalls.loadMapFromCSV("assets/data/cave_walls.csv", "assets/images/cave_tileset.png", 16, 16, 0, 1);
@@ -137,10 +144,10 @@ class PlayState extends FlxState {
 	
 	function enemySpawner(deltaTime:FlxTimer) {
 		var timer:FlxTimer = new FlxTimer();
-		var spawnFrequency = SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave) == null ? 1 : SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave);
+		var spawnFrequency = SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave) == null ? 0.5 : SPAWN_FREQUENCY_BY_WAVE_MAP.get(currentWave);
 		timer.start(spawnFrequency, spawnEnemy, _enemies_in_this_wave);
 
-		if(currentWave == 4) FlxG.cameras.shake(0.015, 1.5);
+		if(currentWave == 4) FlxG.cameras.shake(0.015, 3);
 	}
 
 	function spawnEnemy(deltaTime:FlxTimer) {
@@ -148,15 +155,13 @@ class PlayState extends FlxState {
 		var pointToSpawn:Vector2 = ENEMIES_SPAWN_POINT_LIST[random.int(0, ENEMIES_SPAWN_POINT_LIST.length - 1)];
 		
 		var enemy:Enemy = enemies.getFirstAvailable();
-		enemy.reset(pointToSpawn.x, pointToSpawn.y);
+		if(SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.get(currentWave) != null) {
+			enemy.reset(SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.get(currentWave).x, SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.get(currentWave).y);
+			FlxG.log.add(SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.get(currentWave));
+		} else {
+			enemy.reset(pointToSpawn.x, pointToSpawn.y);
+		}
 		add(enemy);
-	}
-
-	function spawnEnemyAt(x:Int, y:Int) {
-		var enemy:Enemy = enemies.getFirstAvailable();
-		enemy.reset(x, y);
-		add(enemy);
-		findPathAndChasePlayer(enemy);
 	}
 
 	function onOverlap(s1:FlxObject, s2:FlxObject):Void {
@@ -195,10 +200,8 @@ class PlayState extends FlxState {
 				return;
 			}
 			
-			// Tell unit to follow path
 			if (pathPoints != null && enemy.isOnScreen()) {
-				enemy.path.start(pathPoints, 50, FlxPath.FORWARD, true);
-				//_survivor.path.start(pathPoints);
+				enemy.path.start(pathPoints, enemy.getSpeed(), FlxPath.FORWARD, false);
 			}
 		} else {
 			enemy.chasePlayerM();

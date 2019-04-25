@@ -895,9 +895,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","43");
+		_this.setReserved("build","44");
 	} else {
-		_this.h["build"] = "43";
+		_this.h["build"] = "44";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -7643,6 +7643,7 @@ var Enemy = function(wave) {
 	this.set_path(new flixel_util_FlxPath());
 	this._velocity.set_x(0);
 	this._velocity.set_y(0);
+	this.set_angle(flixel_math_FlxAngle.angleBetweenPoint(this,this.playerPos,true) - 180);
 };
 $hxClasses["Enemy"] = Enemy;
 Enemy.__name__ = ["Enemy"];
@@ -7674,7 +7675,10 @@ Enemy.prototype = $extend(Entity.prototype,{
 	}
 	,setRandomVelocityVariedByWave: function(wave) {
 		var speed;
-		if(wave == 0) {
+		if(PlayState.SPECIAL_ENEMY_VELOCITY_IN_WAVE_MAP.h[wave] != null) {
+			var specialVelocity = PlayState.SPECIAL_ENEMY_VELOCITY_IN_WAVE_MAP.h[wave];
+			speed = this.random["int"](specialVelocity - this.random["int"](0,32),specialVelocity + this.random["int"](0,32));
+		} else if(wave == 0) {
 			speed = this.random["float"](20,40);
 		} else if(wave == 1) {
 			speed = this.random["float"](40,80);
@@ -7683,9 +7687,9 @@ Enemy.prototype = $extend(Entity.prototype,{
 		} else if(wave == 3) {
 			speed = this.random["float"](80,100);
 		} else if(wave == 4) {
-			speed = this.random["float"](100,150);
+			speed = this.random["float"](80,110);
 		} else {
-			speed = this.random["float"](80,200);
+			speed = this.random["float"](80,120);
 		}
 		this.ENEMY_SPEED = speed;
 	}
@@ -7731,49 +7735,11 @@ Enemy.prototype = $extend(Entity.prototype,{
 		m.data = 1;
 		mail.send(m);
 	}
+	,getSpeed: function() {
+		return this.ENEMY_SPEED;
+	}
 	,__class__: Enemy
 });
-var haxe_ds_IntMap = function() {
-	this.h = { };
-};
-$hxClasses["haxe.ds.IntMap"] = haxe_ds_IntMap;
-haxe_ds_IntMap.__name__ = ["haxe","ds","IntMap"];
-haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
-haxe_ds_IntMap.prototype = {
-	h: null
-	,set: function(key,value) {
-		this.h[key] = value;
-	}
-	,get: function(key) {
-		return this.h[key];
-	}
-	,exists: function(key) {
-		return this.h.hasOwnProperty(key);
-	}
-	,remove: function(key) {
-		if(!this.h.hasOwnProperty(key)) {
-			return false;
-		}
-		delete(this.h[key]);
-		return true;
-	}
-	,keys: function() {
-		var a = [];
-		for( var key in this.h ) if(this.h.hasOwnProperty(key)) {
-			a.push(key | 0);
-		}
-		return HxOverrides.iter(a);
-	}
-	,iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref[i];
-		}};
-	}
-	,__class__: haxe_ds_IntMap
-};
 var HUD = function(survivor) {
 	var _g = new haxe_ds_IntMap();
 	_g.h[1] = 100;
@@ -8119,14 +8085,13 @@ LandMine.prototype = $extend(Entity.prototype,{
 		flixel_FlxG.overlap(this,PlayState.enemies,$bind(this,this.explode));
 		flixel_FlxG.overlap(this._explosionParticles,PlayState.enemies,$bind(this,this.dealDamage));
 		if(this._currentState != "armed" && !this._explosionParticles.emitting) {
-			this.kill();
+			Entity.prototype.update.call(this,elapsed);
 		}
-		Entity.prototype.update.call(this,elapsed);
 	}
 	,explode: function(s1,s2) {
 		if(this._currentState == "armed") {
 			this._currentState = "exploding";
-			this._explosionParticles.start(true,0.01,0);
+			this._explosionParticles.start();
 		}
 		this.set_alpha(0);
 	}
@@ -8719,6 +8684,7 @@ $hxClasses["PlayState"] = PlayState;
 PlayState.__name__ = ["PlayState"];
 PlayState._hud = null;
 PlayState.ENEMIES_SPAWN_POINT_LIST = null;
+PlayState.SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP = null;
 PlayState.MAIL = null;
 PlayState.__super__ = flixel_FlxState;
 PlayState.prototype = $extend(flixel_FlxState.prototype,{
@@ -8736,6 +8702,9 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,create: function() {
 		PlayState.MAIL = new Mail();
 		PlayState.ENEMIES_SPAWN_POINT_LIST = [new lime_math_Vector2(-8,238),new lime_math_Vector2(flixel_FlxG.width,134),new lime_math_Vector2(flixel_FlxG.width,213),new lime_math_Vector2(475,flixel_FlxG.height)];
+		var _g = new haxe_ds_IntMap();
+		_g.h[4] = PlayState.ENEMIES_SPAWN_POINT_LIST[3];
+		PlayState.SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP = _g;
 		this._mapWalls = new flixel_tile_FlxTilemap();
 		this._mapWalls.loadMapFromCSV("assets/data/cave_walls.csv","assets/images/cave_tileset.png",16,16,null,0,1);
 		this.add(this._mapWalls);
@@ -8795,24 +8764,23 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	}
 	,enemySpawner: function(deltaTime) {
 		var timer = new flixel_util_FlxTimer();
-		var spawnFrequency = PlayState.SPAWN_FREQUENCY_BY_WAVE_MAP.h[this.currentWave] == null ? 1 : PlayState.SPAWN_FREQUENCY_BY_WAVE_MAP.h[this.currentWave];
+		var spawnFrequency = PlayState.SPAWN_FREQUENCY_BY_WAVE_MAP.h[this.currentWave] == null ? 0.5 : PlayState.SPAWN_FREQUENCY_BY_WAVE_MAP.h[this.currentWave];
 		timer.start(spawnFrequency,$bind(this,this.spawnEnemy),this._enemies_in_this_wave);
 		if(this.currentWave == 4) {
-			flixel_FlxG.cameras.shake(0.015,1.5);
+			flixel_FlxG.cameras.shake(0.015,3);
 		}
 	}
 	,spawnEnemy: function(deltaTime) {
 		var random = new flixel_math_FlxRandom();
 		var pointToSpawn = PlayState.ENEMIES_SPAWN_POINT_LIST[random["int"](0,PlayState.ENEMIES_SPAWN_POINT_LIST.length - 1)];
 		var enemy = PlayState.enemies.getFirstAvailable();
-		enemy.reset(pointToSpawn.x,pointToSpawn.y);
+		if(PlayState.SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.h[this.currentWave] != null) {
+			enemy.reset(PlayState.SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.h[this.currentWave].x,PlayState.SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.h[this.currentWave].y);
+			flixel_FlxG.log.advanced(PlayState.SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.h[this.currentWave],flixel_system_debug_log_LogStyle.NORMAL);
+		} else {
+			enemy.reset(pointToSpawn.x,pointToSpawn.y);
+		}
 		this.add(enemy);
-	}
-	,spawnEnemyAt: function(x,y) {
-		var enemy = PlayState.enemies.getFirstAvailable();
-		enemy.reset(x,y);
-		this.add(enemy);
-		this.findPathAndChasePlayer(enemy);
 	}
 	,onOverlap: function(s1,s2) {
 		if(js_Boot.__instanceof(s1,Survivor) && js_Boot.__instanceof(s2,Enemy)) {
@@ -8858,7 +8826,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 				return;
 			}
 			if(pathPoints1 != null && enemy.isOnScreen()) {
-				enemy.path.start(pathPoints1,50,0,true);
+				enemy.path.start(pathPoints1,enemy.getSpeed(),0,false);
 			}
 		} else {
 			enemy.chasePlayerM();
@@ -9237,7 +9205,7 @@ StringTools.quoteWinArg = function(argument,escapeMetaCharacters) {
 };
 var Survivor = function(x,y,bullets) {
 	this.inventoryList = [0];
-	this.money = 2000.0;
+	this.money = 50000.0;
 	var _g = new haxe_ds_IntMap();
 	_g.h[0] = 30;
 	this.itemQtdMap = _g;
@@ -9374,7 +9342,6 @@ Survivor.prototype = $extend(Entity.prototype,{
 			return;
 		}
 		if(this.inventoryList[PlayState.currentInventorySelectedItem] == 2) {
-			flixel_FlxG.log.advanced("oi",flixel_system_debug_log_LogStyle.NORMAL);
 			if(this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] <= 0) {
 				return;
 			}
@@ -23693,6 +23660,47 @@ flixel_input_gamepad_FlxGamepadButton.prototype = $extend(flixel_input_FlxInput.
 	value: null
 	,__class__: flixel_input_gamepad_FlxGamepadButton
 });
+var haxe_ds_IntMap = function() {
+	this.h = { };
+};
+$hxClasses["haxe.ds.IntMap"] = haxe_ds_IntMap;
+haxe_ds_IntMap.__name__ = ["haxe","ds","IntMap"];
+haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
+haxe_ds_IntMap.prototype = {
+	h: null
+	,set: function(key,value) {
+		this.h[key] = value;
+	}
+	,get: function(key) {
+		return this.h[key];
+	}
+	,exists: function(key) {
+		return this.h.hasOwnProperty(key);
+	}
+	,remove: function(key) {
+		if(!this.h.hasOwnProperty(key)) {
+			return false;
+		}
+		delete(this.h[key]);
+		return true;
+	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h ) if(this.h.hasOwnProperty(key)) {
+			a.push(key | 0);
+		}
+		return HxOverrides.iter(a);
+	}
+	,iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref[i];
+		}};
+	}
+	,__class__: haxe_ds_IntMap
+};
 var flixel_input_gamepad__$FlxGamepadInputID_FlxGamepadInputID_$Impl_$ = {};
 $hxClasses["flixel.input.gamepad._FlxGamepadInputID.FlxGamepadInputID_Impl_"] = flixel_input_gamepad__$FlxGamepadInputID_FlxGamepadInputID_$Impl_$;
 flixel_input_gamepad__$FlxGamepadInputID_FlxGamepadInputID_$Impl_$.__name__ = ["flixel","input","gamepad","_FlxGamepadInputID","FlxGamepadInputID_Impl_"];
@@ -119928,7 +119936,7 @@ HUD._CUSTOM_INVENTORY_SPRITE_ANGLES = (function($this) {
 	return $r;
 }(this));
 HUD.isItemStoreOpen = false;
-LandMine._DAMAGE = 5;
+LandMine._DAMAGE = 16;
 openfl_text_Font.__fontByName = new haxe_ds_StringMap();
 openfl_text_Font.__registeredFonts = [];
 Message.OP_DAMAGE = 0;
@@ -119944,21 +119952,28 @@ PlayState.SPAWN_FREQUENCY_BY_WAVE_MAP = (function($this) {
 	_g.h[1] = 0.9;
 	_g.h[2] = 0.7;
 	_g.h[3] = 0.5;
-	_g.h[4] = 0.1;
+	_g.h[4] = 0.25;
 	$r = _g;
 	return $r;
 }(this));
 PlayState.SPECIAL_NUMBER_OF_ENEMIES_BY_WAVE_MAP = (function($this) {
 	var $r;
 	var _g = new haxe_ds_IntMap();
-	_g.h[4] = 25;
+	_g.h[4] = 32;
 	$r = _g;
 	return $r;
 }(this));
 PlayState.SPECIAL_TIME_UNTIL_NEXT_WAVE_MAP = (function($this) {
 	var $r;
 	var _g = new haxe_ds_IntMap();
-	_g.h[4] = 15;
+	_g.h[4] = 10;
+	$r = _g;
+	return $r;
+}(this));
+PlayState.SPECIAL_ENEMY_VELOCITY_IN_WAVE_MAP = (function($this) {
+	var $r;
+	var _g = new haxe_ds_IntMap();
+	_g.h[4] = 50;
 	$r = _g;
 	return $r;
 }(this));

@@ -22,7 +22,7 @@ class Survivor extends Entity {
     ];
 
     // Inventory
-    public var money:Float = 2000.0;
+    public var money:Float = 50000.0;
     public var inventoryList:Array<Int> = [PlayState.WEAPON_PISTOL];    
     
 	 // Sound effects
@@ -134,7 +134,6 @@ class Survivor extends Entity {
             if((FlxG.mouse.x < (x + maxDistanceToPlantTheMine)) || (FlxG.mouse.x > (x - maxDistanceToPlantTheMine))
                 || (FlxG.mouse.y < (y + maxDistanceToPlantTheMine)) || (FlxG.mouse.y > (y - maxDistanceToPlantTheMine))) {
             }*/
-            FlxG.log.add("oi");
             if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
             itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
             FlxG.state.add(new LandMine(FlxG.mouse.x, FlxG.mouse.y));

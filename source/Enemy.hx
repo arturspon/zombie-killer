@@ -1,5 +1,6 @@
 package;
 
+import flixel.math.FlxAngle;
 import flixel.FlxG;
 import flixel.util.FlxPath;
 import flixel.math.FlxRandom;
@@ -34,6 +35,8 @@ class Enemy extends Entity {
 
         _velocity.x = 0;
         _velocity.y = 0;
+
+        angle = FlxAngle.angleBetweenPoint(this, playerPos, true) - 180;
     }
 
     override public function update(elapsed:Float):Void {
@@ -66,18 +69,23 @@ class Enemy extends Entity {
     function setRandomVelocityVariedByWave(wave:Int) {
         var speed:Float;
 
-        if(wave == 0) {
-            speed = random.float(20, 40);
-        } else if (wave == 1) { 
-            speed = random.float(40, 80);
-        } else if (wave == 2) { 
-            speed = random.float(40, 100);
-        } else if (wave == 3) { 
-            speed = random.float(80, 100);
-        } else if (wave == 4) { 
-            speed = random.float(100, 150);
+        if(PlayState.SPECIAL_ENEMY_VELOCITY_IN_WAVE_MAP.get(wave) != null) {
+            var specialVelocity = PlayState.SPECIAL_ENEMY_VELOCITY_IN_WAVE_MAP.get(wave);
+            speed = random.int(specialVelocity - random.int(0, 32), specialVelocity + random.int(0, 32));
         } else {
-            speed = random.float(80, 200);
+            if(wave == 0) {
+                speed = random.float(20, 40);
+            } else if (wave == 1) { 
+                speed = random.float(40, 80);
+            } else if (wave == 2) { 
+                speed = random.float(40, 100);
+            } else if (wave == 3) { 
+                speed = random.float(80, 100);
+            } else if (wave == 4) { 
+                speed = random.float(80, 110);
+            } else {
+                speed = random.float(80, 120);
+            }
         }
         
         ENEMY_SPEED = speed;
@@ -111,6 +119,7 @@ class Enemy extends Entity {
         
         velocity.x = _velocity.x;
         velocity.y = _velocity.y;
+        
     }
 
     public function stopChasingPlayer() {
@@ -128,6 +137,10 @@ class Enemy extends Entity {
         m.op = Message.OP_DAMAGE;
         m.data = 1;
         mail.send(m);
+    }
+
+    public function getSpeed():Float {
+        return ENEMY_SPEED;
     }
     
 }

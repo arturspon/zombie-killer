@@ -1,5 +1,6 @@
 package;
 
+import flixel.util.FlxColor;
 import flixel.util.FlxPath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxMath;
@@ -116,7 +117,11 @@ class PlayState extends FlxState {
 		playerHealth = _survivor.health;
 		playerMoney = _survivor.money;
 
-		if(_survivor.health <= 0) FlxG.switchState(new MenuState());
+		if(_survivor.health <= 0) {
+			FlxG.camera.fade(FlxColor.BLACK,.33, false, function() {
+				FlxG.switchState(new MenuState());
+			});
+		}
 	}
 
 	function checkIfWaveIsOver() {

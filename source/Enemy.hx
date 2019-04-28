@@ -1,5 +1,6 @@
 package;
 
+import flixel.tweens.FlxEase;
 import flixel.math.FlxMath;
 import flixel.math.FlxAngle;
 import flixel.FlxG;
@@ -8,6 +9,7 @@ import flixel.math.FlxRandom;
 import flixel.math.FlxPoint;
 import flixel.math.FlxVector;
 import flixel.util.FlxTimer;
+import flixel.tweens.FlxTween;
 
 class Enemy extends Entity {
     var _velocity:FlxVector = new FlxVector();

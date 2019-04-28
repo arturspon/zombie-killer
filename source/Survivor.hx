@@ -148,7 +148,8 @@ class Survivor extends Entity {
                 bullet.velocity.x = _velocity.x;
                 bullet.velocity.y = _velocity.y;
 
-                //_sndPistolShot.play(true);
+                _sndPistolShot.volume = 0.4;
+                _sndPistolShot.play(true);
                 
                 return;
             }

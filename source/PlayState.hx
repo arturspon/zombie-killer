@@ -72,7 +72,7 @@ class PlayState extends FlxState {
         MAIL = new Mail();
 
 		// Spawn points
-		ENEMIES_SPAWN_POINT_LIST = [new Vector2(-8, 238), new Vector2(FlxG.width, 134), new Vector2(FlxG.width, 213), new Vector2(475, FlxG.height)];
+		ENEMIES_SPAWN_POINT_LIST = [new Vector2(-1, 238), new Vector2(FlxG.width, 134), new Vector2(FlxG.width, 213), new Vector2(475, FlxG.height)];
 		/*SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP = [
 			4 => ENEMIES_SPAWN_POINT_LIST[3]
 		];*/
@@ -115,6 +115,8 @@ class PlayState extends FlxState {
 		checkIfWaveIsOver();
 		playerHealth = _survivor.health;
 		playerMoney = _survivor.money;
+
+		if(_survivor.health <= 0) FlxG.switchState(new MenuState());
 	}
 
 	function checkIfWaveIsOver() {
@@ -185,6 +187,7 @@ class PlayState extends FlxState {
 	function findPathAndChasePlayer(enemy:Enemy):Void {
 		updatePlayerMidPoint(enemy);
 
+		if(!enemy.isOnScreen()) enemy.chasePlayerM();
 		if(!_mapWalls.ray(enemy.getMidpoint(), _survivor.getMidpoint())) {
 			enemy.stopChasingPlayer();
 

@@ -1,5 +1,6 @@
 package;
 
+import flixel.math.FlxMath;
 import flixel.math.FlxAngle;
 import flixel.FlxG;
 import flixel.util.FlxPath;
@@ -34,13 +35,12 @@ class Enemy extends Entity {
         path = new FlxPath();
 
         _velocity.x = 0;
-        _velocity.y = 0;
-
-        angle = FlxAngle.angleBetweenPoint(this, playerPos, true) - 180;
+        _velocity.y = 0;        
     }
 
     override public function update(elapsed:Float):Void {
         chasePlayer();
+        angle = FlxAngle.angleBetweenPoint(this, playerPos, true);
         super.update(elapsed);
     }
 
@@ -52,15 +52,6 @@ class Enemy extends Entity {
             }
         }
     }
-
-    public function showHealthBar() {
-        //healthBar.revive();
-    }
-
-    /*function setWave(wave:Int) {
-        setHealthByWave(wave);
-        setRandomVelocityVariedByWave(wave);
-    }*/
 
     function setHealthByWave(wave:Int) {
         health = 2 + wave;
@@ -104,9 +95,6 @@ class Enemy extends Entity {
             velocity.x = 0;
             velocity.y = 0;
         }
-
-        //angle = FlxAngle.angleBetweenPoint(this, playerPos, true) - 180;
-        //FlxVelocity.moveTowardsPoint(this, new FlxPoint(300,300), Std.int(ENEMY_SPEED));
     }
 
     public function chasePlayerM() {

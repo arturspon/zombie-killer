@@ -12,6 +12,8 @@
 -D hscript=2.3.0
 -cp C:/HaxeToolkit/haxe/lib/flixel-addons/2,7,5
 -D flixel-addons=2.7.5
+-cp C:/HaxeToolkit/haxe/lib/flixel-ui/2,3,2
+-D flixel-ui=2.3.2
 -cp source
 -D lime-openal
 -D native

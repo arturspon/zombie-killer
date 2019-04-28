@@ -1,6 +1,5 @@
 package;
 
-import flixel.math.FlxMath;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
@@ -9,15 +8,40 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 using flixel.util.FlxSpriteUtil;
 import flixel.ui.FlxBar;
+import flixel.addons.ui.FlxUIBar;
 
 class HUD extends FlxTypedGroup<FlxSprite> {
     var _survivor:Survivor;
 
-    var _healthBar:FlxBar;
     var _ammoForCurrentWeapon:FlxText;
     var _money:FlxText;
     var _wave:FlxText;
     var _timeUntilNextWave:FlxText;
+
+    var _healthBar:FlxUIBar;
+    var _healthBarStyle:FlxBarStyle = {
+        borderColor: null,
+        chunkSize: null,
+        emptyColors: null,
+        emptyImgSrc: null,
+        filledColor: FlxColor.RED, 
+        filledColors: null,
+        emptyColor: FlxColor.GRAY,
+        filledImgSrc: null,
+        gradRotation: null
+    };
+    var _staminaBar:FlxUIBar;
+    var _staminaBarStyle:FlxBarStyle = {
+        borderColor: null,
+        chunkSize: null,
+        emptyColors: null,
+        emptyImgSrc: null,
+        filledColor: FlxColor.YELLOW, 
+        filledColors: null,
+        emptyColor: FlxColor.GRAY,
+        filledImgSrc: null,
+        gradRotation: null
+    };
 
     var lineStyle:LineStyle = { color: FlxColor.GRAY, thickness: 1 };
     var drawStyle:DrawStyle = { smoothing: true };
@@ -56,11 +80,10 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
         _survivor = survivor;
 
-        _healthBar = new FlxBar(5, 12);
-        _healthBar.parent = _survivor;
-        _healthBar.parentVariable = "health";
-        _healthBar.setRange(0, 10);
-        _healthBar.createColoredFilledBar(0xffff0000, true, 0xff990000);
+        _healthBar = new FlxUIBar(0, 0, LEFT_TO_RIGHT, 24, 2, _survivor, "health", 0, 10, false);
+        _healthBar.set_style(_healthBarStyle);
+        _staminaBar = new FlxUIBar(0, 0, LEFT_TO_RIGHT, 24, 2, _survivor, "_stamina", 0, 10, false);
+        _staminaBar.set_style(_staminaBarStyle);
 
         _ammoForCurrentWeapon = new FlxText(5, _healthBar.y + _healthBar.height + 8, 0, "Ammo: ", 16);
         _money = new FlxText(5, _ammoForCurrentWeapon.y + _ammoForCurrentWeapon.height + 8, 0, "$0", 16);
@@ -79,6 +102,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         updateInventory();
 
         add(_healthBar);
+        add(_staminaBar);
         add(_ammoForCurrentWeapon);
         add(_money);
         add(_wave);
@@ -88,9 +112,11 @@ class HUD extends FlxTypedGroup<FlxSprite> {
     override public function update(elapsed:Float):Void {
         var s:PlayState = cast FlxG.state;
         _wave.text = "Wave " + (s.currentWave + 1);
-
-        // playerMoneyRounded:Float = FlxMath.roundDecimal(s.playerMoney, 2);
         _money.text = "$" + s.playerMoney;
+        _healthBar.x = _survivor.x;
+        _healthBar.y = _staminaBar.y - _staminaBar.height - 2;
+        _staminaBar.x = _survivor.x;
+        _staminaBar.y = _survivor.y - 4;
 
         var ammoForCurrentWeapon = _survivor.itemQtdMap.get(_survivor.inventoryList[PlayState.currentInventorySelectedItem]) == null ? 0 : _survivor.itemQtdMap.get(_survivor.inventoryList[PlayState.currentInventorySelectedItem]);
         if(ammoForCurrentWeapon <= 10) {

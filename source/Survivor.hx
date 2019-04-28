@@ -27,7 +27,7 @@ class Survivor extends Entity {
     var _staminaTimer = new FlxTimer();
 
     // Inventory
-    public var money:Float = 50000.0;
+    public var money:Float = 0.0;
     public var inventoryList:Array<Int> = [PlayState.WEAPON_PISTOL];    
     
 	 // Sound effects
@@ -149,17 +149,15 @@ class Survivor extends Entity {
                 bullet.velocity.x = _velocity.x;
                 bullet.velocity.y = _velocity.y;
 
-                _sndPistolShot.play(true);
+                //_sndPistolShot.play(true);
                 
                 return;
             }
             
         if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.LAND_MINE) {
-            if(FlxMath.distanceToMouse(this) >= 135 && FlxMath.distanceToMouse(this) <= 180) {
-                if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
-                itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
-                FlxG.state.add(new LandMine(FlxG.mouse.x, FlxG.mouse.y));
-            }
+            if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
+            itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
+            FlxG.state.add(new LandMine(FlxG.mouse.x, FlxG.mouse.y));
             return;
         }
     }

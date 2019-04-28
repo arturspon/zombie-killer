@@ -76,15 +76,15 @@ class Enemy extends Entity {
             if(wave == 0) {
                 speed = random.float(20, 40);
             } else if (wave == 1) { 
-                speed = random.float(40, 80);
+                speed = random.float(40, 60);
             } else if (wave == 2) { 
-                speed = random.float(40, 100);
+                speed = random.float(40, 80);
             } else if (wave == 3) { 
                 speed = random.float(80, 100);
             } else if (wave == 4) { 
-                speed = random.float(80, 110);
+                speed = random.float(70, 110);
             } else {
-                speed = random.float(80, 120);
+                speed = random.float(40, 120 + (2*wave));
             }
         }
         
@@ -118,8 +118,7 @@ class Enemy extends Entity {
         _velocity.scale(ENEMY_SPEED);
         
         velocity.x = _velocity.x;
-        velocity.y = _velocity.y;
-        
+        velocity.y = _velocity.y;        
     }
 
     public function stopChasingPlayer() {

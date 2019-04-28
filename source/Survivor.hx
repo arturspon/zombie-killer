@@ -1,5 +1,6 @@
 package;
 
+import flixel.math.FlxMath;
 import flixel.math.FlxAngle;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
@@ -11,7 +12,7 @@ class Survivor extends Entity {
     var _bullets:FlxTypedGroup<Bullet>;
     var _velocity:FlxVector = new FlxVector();
     var _shootTimer = new FlxTimer();
-    static var PLAYER_SPEED = 1.5;
+    static var PLAYER_SPEED = 1.25;
     static var BULLET_SPEED = 2048;
     static var FIRE_RATE_MAP = [
         PlayState.WEAPON_PISTOL => 1 / 7,
@@ -20,6 +21,10 @@ class Survivor extends Entity {
     public var itemQtdMap:Map<Int, Int> = [
         PlayState.WEAPON_PISTOL => 30
     ];
+
+    // Stamina (for running)
+    var _stamina:Int = 10;
+    var _staminaTimer = new FlxTimer();
 
     // Inventory
     public var money:Float = 50000.0;
@@ -51,6 +56,7 @@ class Survivor extends Entity {
 
         givePistolAmmoPeriodically();
         restoreHealthPeriodically();
+        restoreStaminaPeriodically();
     }
 
     override public function update(elapsed:Float):Void	{
@@ -78,7 +84,22 @@ class Survivor extends Entity {
     }
 
     function checkInputs() {
-        // Movement and combat
+        // Movement
+        playerMovementInput();
+
+        // Combat
+        if(FlxG.mouse.justPressed) {
+            shoot();
+        }
+        if(FlxG.mouse.pressed) {
+            if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) shoot();
+        }
+
+        // Inventory
+        updateInventorySelectedItem();
+    }
+
+    function playerMovementInput() {
         if(FlxG.keys.pressed.A && x > 0){
             x -= PLAYER_SPEED;
         }
@@ -91,15 +112,20 @@ class Survivor extends Entity {
         if(FlxG.keys.pressed.S && y < FlxG.height - height){
             y += PLAYER_SPEED;
         }
-        if(FlxG.mouse.justPressed) {
-            shoot();
+        if(FlxG.keys.pressed.SHIFT) {
+            run();
+        } else {
+            PLAYER_SPEED = 1.25;
         }
-        if(FlxG.mouse.pressed) {
-            if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) shoot();
-        }
+    }
 
-        // Inventory
-        updateInventorySelectedItem();
+    function run() {
+        if(_stamina > 0) PLAYER_SPEED = 2;
+        else PLAYER_SPEED = 1.25;
+
+        if(_staminaTimer.active) return;
+        _staminaTimer.start(0.25);
+        if(_stamina > 0) _stamina--;
     }
 
     function shoot() {
@@ -127,15 +153,13 @@ class Survivor extends Entity {
                 
                 return;
             }
-
+            
         if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.LAND_MINE) {
-            /*var maxDistanceToPlantTheMine = 32;
-            if((FlxG.mouse.x < (x + maxDistanceToPlantTheMine)) || (FlxG.mouse.x > (x - maxDistanceToPlantTheMine))
-                || (FlxG.mouse.y < (y + maxDistanceToPlantTheMine)) || (FlxG.mouse.y > (y - maxDistanceToPlantTheMine))) {
-            }*/
-            if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
-            itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
-            FlxG.state.add(new LandMine(FlxG.mouse.x, FlxG.mouse.y));
+            if(FlxMath.distanceToMouse(this) >= 135 && FlxMath.distanceToMouse(this) <= 180) {
+                if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
+                itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
+                FlxG.state.add(new LandMine(FlxG.mouse.x, FlxG.mouse.y));
+            }
             return;
         }
     }
@@ -174,6 +198,12 @@ class Survivor extends Entity {
     function restoreHealthPeriodically() {
 		new FlxTimer().start(5, function(deltaTime:FlxTimer){
             if(health < 10 && alive) health++;
+        }, 0);
+    }
+
+    function restoreStaminaPeriodically() {
+		new FlxTimer().start(2.5, function(deltaTime:FlxTimer){
+            if(_stamina < 10 && alive) _stamina++;
         }, 0);
     }
 }

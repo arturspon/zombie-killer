@@ -895,9 +895,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","45");
+		_this.setReserved("build","46");
 	} else {
-		_this.h["build"] = "45";
+		_this.h["build"] = "46";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -7857,9 +7857,9 @@ HUD.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 			++_g;
 			if(this._inventoryRenderedItems.indexOf(item) < 0) {
 				var xPositionToRenderItem = flixel_FlxG.width / 2 - this.inventoryBarTotalWidth / 2 + this.inventorySpaceSquareSize * this._inventoryRenderedItems.length;
-				var s = new flixel_FlxSprite(xPositionToRenderItem,this.inventorySpaceSquareSize / 2 - 4);
+				var s = new flixel_FlxSprite(xPositionToRenderItem,this.inventorySpaceSquareSize / 2 - 5);
 				s.loadGraphic(this._itemSpriteMap.h[item],false);
-				s.setGraphicSize(32);
+				s.setGraphicSize(28);
 				s.updateHitbox();
 				flixel_util_FlxSpriteUtil.updateSpriteGraphic(s);
 				s.set_angle(HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[item] == null ? 0 : HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[item]);
@@ -7917,16 +7917,14 @@ HUD.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 			var itemSpace = new flixel_FlxSprite().makeGraphic(flixel_FlxG.width,flixel_FlxG.height,0,true);
 			flixel_util_FlxSpriteUtil.drawRect(itemSpace,itemX,itemY,itemStoreSpaceSize,itemStoreSpaceSize,0,this.lineStyle);
 			this._itemStore.add(itemSpace);
-			var t = new flixel_FlxSprite((itemX + itemStoreSpaceSize) / 2,itemY);
-			this.add(t);
 			var itemToSell = new flixel_FlxSprite();
 			itemToSell.loadGraphic(this._itemSpriteMap.h[itemKey2[0]],false);
-			itemToSell.setGraphicSize(itemStoreSpaceSize - itemStoreSpacePadding);
+			itemToSell.setGraphicSize(48);
 			flixel_util_FlxSpriteUtil.updateSpriteGraphic(itemToSell);
 			itemToSell.updateFramePixels();
 			itemToSell.set_angle(HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[itemKey2[0]] == null ? 0 : HUD._CUSTOM_INVENTORY_SPRITE_ANGLES.h[itemKey2[0]]);
-			itemToSell.set_x(itemX + itemToSell.get_width() / 2);
-			itemToSell.set_y(itemY + 32);
+			itemToSell.set_x(itemX + itemStoreSpaceSize / 2 - itemToSell.get_width() / 2);
+			itemToSell.set_y(itemY + 24);
 			this._itemStore.add(itemToSell);
 			var btnBuy = new flixel_ui_FlxButton(0,0,"",(function(itemKey3) {
 				return function() {
@@ -8182,7 +8180,7 @@ ManifestResources.init = function(config) {
 	var data;
 	var manifest;
 	var library;
-	data = "{\"name\":null,\"assets\":\"aoy4:pathy25:assets%2Fdata%2Fcave.jsony4:sizei12760y4:typey4:TEXTy2:idR1y7:preloadtgoR0y31:assets%2Fdata%2Fcave_ground.csvR2i3994R3R4R5R7R6tgoR0y30:assets%2Fdata%2Fcave_walls.csvR2i3835R3R4R5R8R6tgoR0y28:assets%2Fimages%2Fbullet.pngR2i660R3y5:IMAGER5R9R6tgoR0y33:assets%2Fimages%2Fbullet_icon.pngR2i9545R3R10R5R11R6tgoR0y34:assets%2Fimages%2Fbullet_icon1.pngR2i1892R3R10R5R12R6tgoR0y34:assets%2Fimages%2Fcave_tileset.pngR2i44054R3R10R5R13R6tgoR0y35:assets%2Fimages%2Fdungeon_tiles.pngR2i20013R3R10R5R14R6tgoR0y31:assets%2Fimages%2Fland_mine.pngR2i657R3R10R5R15R6tgoR0y36:assets%2Fimages%2Fland_mine_icon.pngR2i2031R3R10R5R16R6tgoR0y34:assets%2Fimages%2Fsimple_heart.pngR2i249R3R10R5R17R6tgoR0y41:assets%2Fimages%2Fsurvivor%2Fsurvivor.pngR2i2037091R3R10R5R18R6tgoR0y54:assets%2Fimages%2Fsurvivor%2Fsurvivor_idle_handgun.pngR2i429494R3R10R5R19R6tgoR0y54:assets%2Fimages%2Fsurvivor%2Fsurvivor_move_handgun.pngR2i434396R3R10R5R20R6tgoR0y55:assets%2Fimages%2Fsurvivor%2Fsurvivor_shoot_handgun.pngR2i89875R3R10R5R21R6tgoR0y35:assets%2Fimages%2Fweapons%2FBAR.pngR2i500R3R10R5R22R6tgoR0y39:assets%2Fimages%2Fweapons%2FBazooka.pngR2i510R3R10R5R23R6tgoR0y42:assets%2Fimages%2Fweapons%2FBren%20LMG.pngR2i672R3R10R5R24R6tgoR0y44:assets%2Fimages%2Fweapons%2FColt%20M1911.pngR2i518R3R10R5R25R6tgoR0y39:assets%2Fimages%2Fweapons%2FDP%2028.pngR2i546R3R10R5R26R6tgoR0y49:assets%2Fimages%2Fweapons%2FEnfield%20No.%202.pngR2i419R3R10R5R27R6tgoR0y43:assets%2Fimages%2Fweapons%2FGewehr%2043.pngR2i455R3R10R5R28R6tgoR0y47:assets%2Fimages%2Fweapons%2FKarabiner%2098k.pngR2i454R3R10R5R29R6tgoR0y43:assets%2Fimages%2Fweapons%2FM1%20Garand.pngR2i458R3R10R5R30R6tgoR0y39:assets%2Fimages%2Fweapons%2FMG%2042.pngR2i673R3R10R5R31R6tgoR0y48:assets%2Fimages%2Fweapons%2FMk%202%20grenade.pngR2i554R3R10R5R32R6tgoR0y46:assets%2Fimages%2Fweapons%2FMosin%20Nagant.pngR2i486R3R10R5R33R6tgoR0y39:assets%2Fimages%2Fweapons%2FMP%2040.pngR2i520R3R10R5R34R6tgoR0y45:assets%2Fimages%2Fweapons%2FPanzerschreck.pngR2i486R3R10R5R35R6tgoR0y41:assets%2Fimages%2Fweapons%2FPPSh%2041.pngR2i445R3R10R5R36R6tgoR0y51:assets%2Fimages%2Fweapons%2FSpringfield%20M1903.pngR2i437R3R10R5R37R6tgoR0y36:assets%2Fimages%2Fweapons%2FSten.pngR2i453R3R10R5R38R6tgoR0y38:assets%2Fimages%2Fweapons%2FStG_44.pngR2i789R3R10R5R39R6tgoR0y47:assets%2Fimages%2Fweapons%2FStick%20grenade.pngR2i301R3R10R5R40R6tgoR0y38:assets%2Fimages%2Fweapons%2FSVT-40.pngR2i508R3R10R5R41R6tgoR0y40:assets%2Fimages%2Fweapons%2FThompson.pngR2i519R3R10R5R42R6tgoR0y45:assets%2Fimages%2Fweapons%2FTokarev_TT-33.pngR2i454R3R10R5R43R6tgoR0y51:assets%2Fimages%2Fweapons%2FType%2097%20grenade.pngR2i396R3R10R5R44R6tgoR0y51:assets%2Fimages%2Fweapons%2FType%2099%20Arisaka.pngR2i460R3R10R5R45R6tgoR0y47:assets%2Fimages%2Fweapons%2FType%2099%20LMG.pngR2i799R3R10R5R46R6tgoR0y45:assets%2Fimages%2Fweapons%2FWalther%20P38.pngR2i440R3R10R5R47R6tgoR0y45:assets%2Fimages%2Fzombie%2Fzombie_running.pngR2i617531R3R10R5R48R6tgoR0y36:assets%2Fmusic%2Fmusic-goes-here.txtR2zR3R4R5R49R6tgoR2i713270R3y5:SOUNDR5y33:assets%2Fsounds%2Fpistol_shot.wavy9:pathGroupaR51hR6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R53R6tgoR2i2114R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3R52aR55y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R54R5y28:flixel%2Fsounds%2Fflixel.mp3R52aR57y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i5794R3R50R5R56R52aR55R56hgoR2i33629R3R50R5R58R52aR57R58hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R59R60y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i519R3R10R5R65R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i3280R3R10R5R66R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
+	data = "{\"name\":null,\"assets\":\"aoy4:pathy25:assets%2Fdata%2Fcave.jsony4:sizei12760y4:typey4:TEXTy2:idR1y7:preloadtgoR0y31:assets%2Fdata%2Fcave_ground.csvR2i3994R3R4R5R7R6tgoR0y30:assets%2Fdata%2Fcave_walls.csvR2i3835R3R4R5R8R6tgoR0y28:assets%2Fimages%2Fbullet.pngR2i660R3y5:IMAGER5R9R6tgoR0y33:assets%2Fimages%2Fbullet_icon.pngR2i9545R3R10R5R11R6tgoR0y34:assets%2Fimages%2Fbullet_icon1.pngR2i1892R3R10R5R12R6tgoR0y34:assets%2Fimages%2Fcave_tileset.pngR2i44054R3R10R5R13R6tgoR0y35:assets%2Fimages%2Fdungeon_tiles.pngR2i20013R3R10R5R14R6tgoR0y31:assets%2Fimages%2Fland_mine.pngR2i657R3R10R5R15R6tgoR0y36:assets%2Fimages%2Fland_mine_icon.pngR2i1275R3R10R5R16R6tgoR0y34:assets%2Fimages%2Fsimple_heart.pngR2i249R3R10R5R17R6tgoR0y41:assets%2Fimages%2Fsurvivor%2Fsurvivor.pngR2i2037091R3R10R5R18R6tgoR0y54:assets%2Fimages%2Fsurvivor%2Fsurvivor_idle_handgun.pngR2i429494R3R10R5R19R6tgoR0y54:assets%2Fimages%2Fsurvivor%2Fsurvivor_move_handgun.pngR2i434396R3R10R5R20R6tgoR0y55:assets%2Fimages%2Fsurvivor%2Fsurvivor_shoot_handgun.pngR2i89875R3R10R5R21R6tgoR0y35:assets%2Fimages%2Fweapons%2FBAR.pngR2i500R3R10R5R22R6tgoR0y39:assets%2Fimages%2Fweapons%2FBazooka.pngR2i510R3R10R5R23R6tgoR0y42:assets%2Fimages%2Fweapons%2FBren%20LMG.pngR2i672R3R10R5R24R6tgoR0y44:assets%2Fimages%2Fweapons%2FColt%20M1911.pngR2i518R3R10R5R25R6tgoR0y39:assets%2Fimages%2Fweapons%2FDP%2028.pngR2i546R3R10R5R26R6tgoR0y49:assets%2Fimages%2Fweapons%2FEnfield%20No.%202.pngR2i419R3R10R5R27R6tgoR0y43:assets%2Fimages%2Fweapons%2FGewehr%2043.pngR2i455R3R10R5R28R6tgoR0y47:assets%2Fimages%2Fweapons%2FKarabiner%2098k.pngR2i454R3R10R5R29R6tgoR0y43:assets%2Fimages%2Fweapons%2FM1%20Garand.pngR2i458R3R10R5R30R6tgoR0y39:assets%2Fimages%2Fweapons%2FMG%2042.pngR2i673R3R10R5R31R6tgoR0y48:assets%2Fimages%2Fweapons%2FMk%202%20grenade.pngR2i554R3R10R5R32R6tgoR0y46:assets%2Fimages%2Fweapons%2FMosin%20Nagant.pngR2i486R3R10R5R33R6tgoR0y39:assets%2Fimages%2Fweapons%2FMP%2040.pngR2i520R3R10R5R34R6tgoR0y45:assets%2Fimages%2Fweapons%2FPanzerschreck.pngR2i486R3R10R5R35R6tgoR0y41:assets%2Fimages%2Fweapons%2FPPSh%2041.pngR2i445R3R10R5R36R6tgoR0y51:assets%2Fimages%2Fweapons%2FSpringfield%20M1903.pngR2i437R3R10R5R37R6tgoR0y36:assets%2Fimages%2Fweapons%2FSten.pngR2i453R3R10R5R38R6tgoR0y38:assets%2Fimages%2Fweapons%2FStG_44.pngR2i789R3R10R5R39R6tgoR0y47:assets%2Fimages%2Fweapons%2FStick%20grenade.pngR2i301R3R10R5R40R6tgoR0y38:assets%2Fimages%2Fweapons%2FSVT-40.pngR2i508R3R10R5R41R6tgoR0y40:assets%2Fimages%2Fweapons%2FThompson.pngR2i519R3R10R5R42R6tgoR0y45:assets%2Fimages%2Fweapons%2FTokarev_TT-33.pngR2i454R3R10R5R43R6tgoR0y51:assets%2Fimages%2Fweapons%2FType%2097%20grenade.pngR2i396R3R10R5R44R6tgoR0y51:assets%2Fimages%2Fweapons%2FType%2099%20Arisaka.pngR2i460R3R10R5R45R6tgoR0y47:assets%2Fimages%2Fweapons%2FType%2099%20LMG.pngR2i799R3R10R5R46R6tgoR0y45:assets%2Fimages%2Fweapons%2FWalther%20P38.pngR2i440R3R10R5R47R6tgoR0y45:assets%2Fimages%2Fzombie%2Fzombie_running.pngR2i617531R3R10R5R48R6tgoR0y36:assets%2Fmusic%2Fmusic-goes-here.txtR2zR3R4R5R49R6tgoR2i713270R3y5:SOUNDR5y33:assets%2Fsounds%2Fpistol_shot.wavy9:pathGroupaR51hR6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R53R6tgoR2i2114R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3R52aR55y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R54R5y28:flixel%2Fsounds%2Fflixel.mp3R52aR57y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i5794R3R50R5R56R52aR55R56hgoR2i33629R3R50R5R58R52aR57R58hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R59R60y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i519R3R10R5R65R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i3280R3R10R5R66R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
 	manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
 	library = lime_utils_AssetLibrary.fromManifest(manifest);
 	lime_utils_Assets.registerLibrary("default",library);
@@ -9204,6 +9202,8 @@ StringTools.quoteWinArg = function(argument,escapeMetaCharacters) {
 var Survivor = function(x,y,bullets) {
 	this.inventoryList = [0];
 	this.money = 50000.0;
+	this._staminaTimer = new flixel_util_FlxTimer();
+	this._stamina = 10;
 	var _g = new haxe_ds_IntMap();
 	_g.h[0] = 30;
 	this.itemQtdMap = _g;
@@ -9225,6 +9225,7 @@ var Survivor = function(x,y,bullets) {
 	this._velocity.set_y(0);
 	this.givePistolAmmoPeriodically();
 	this.restoreHealthPeriodically();
+	this.restoreStaminaPeriodically();
 };
 $hxClasses["Survivor"] = Survivor;
 Survivor.__name__ = ["Survivor"];
@@ -9234,6 +9235,8 @@ Survivor.prototype = $extend(Entity.prototype,{
 	,_velocity: null
 	,_shootTimer: null
 	,itemQtdMap: null
+	,_stamina: null
+	,_staminaTimer: null
 	,money: null
 	,inventoryList: null
 	,_sndPistolShot: null
@@ -9260,6 +9263,19 @@ Survivor.prototype = $extend(Entity.prototype,{
 		this.set_angle(flixel_math_FlxAngle.angleBetweenMouse(this,true));
 	}
 	,checkInputs: function() {
+		this.playerMovementInput();
+		if(flixel_FlxG.mouse._leftButton.current == 2) {
+			this.shoot();
+		}
+		var _this = flixel_FlxG.mouse._leftButton;
+		if(_this.current == 1 || _this.current == 2) {
+			if(this.inventoryList[PlayState.currentInventorySelectedItem] == 1) {
+				this.shoot();
+			}
+		}
+		this.updateInventorySelectedItem();
+	}
+	,playerMovementInput: function() {
 		var tmp;
 		var _this = flixel_FlxG.keys.pressed;
 		if(_this.keyManager.checkStatus(65,_this.status)) {
@@ -9304,16 +9320,27 @@ Survivor.prototype = $extend(Entity.prototype,{
 			var _g3 = this;
 			_g3.set_y(_g3.y + Survivor.PLAYER_SPEED);
 		}
-		if(flixel_FlxG.mouse._leftButton.current == 2) {
-			this.shoot();
+		var _this4 = flixel_FlxG.keys.pressed;
+		if(_this4.keyManager.checkStatus(16,_this4.status)) {
+			this.run();
+		} else {
+			Survivor.PLAYER_SPEED = 1.25;
 		}
-		var _this4 = flixel_FlxG.mouse._leftButton;
-		if(_this4.current == 1 || _this4.current == 2) {
-			if(this.inventoryList[PlayState.currentInventorySelectedItem] == 1) {
-				this.shoot();
-			}
+		flixel_FlxG.log.advanced(this._stamina,flixel_system_debug_log_LogStyle.NORMAL);
+	}
+	,run: function() {
+		if(this._stamina > 0) {
+			Survivor.PLAYER_SPEED = 2;
+		} else {
+			Survivor.PLAYER_SPEED = 1.25;
 		}
-		this.updateInventorySelectedItem();
+		if(this._staminaTimer.active) {
+			return;
+		}
+		this._staminaTimer.start(0.25);
+		if(this._stamina > 0) {
+			this._stamina--;
+		}
 	}
 	,shoot: function() {
 		if(this._shootTimer.active) {
@@ -9340,11 +9367,23 @@ Survivor.prototype = $extend(Entity.prototype,{
 			return;
 		}
 		if(this.inventoryList[PlayState.currentInventorySelectedItem] == 2) {
-			if(this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] <= 0) {
-				return;
+			var tmp;
+			var dx = this.x + this.origin.x - flixel_FlxG.mouse.screenX;
+			var dy = this.y + this.origin.y - flixel_FlxG.mouse.screenY;
+			if((Math.sqrt(dx * dx + dy * dy) | 0) >= 135) {
+				var dx1 = this.x + this.origin.x - flixel_FlxG.mouse.screenX;
+				var dy1 = this.y + this.origin.y - flixel_FlxG.mouse.screenY;
+				tmp = (Math.sqrt(dx1 * dx1 + dy1 * dy1) | 0) <= 180;
+			} else {
+				tmp = false;
 			}
-			this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] = this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] - 1;
-			flixel_FlxG.game._state.add(new LandMine(flixel_FlxG.mouse.x,flixel_FlxG.mouse.y));
+			if(tmp) {
+				if(this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] <= 0) {
+					return;
+				}
+				this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] = this.itemQtdMap.h[this.inventoryList[PlayState.currentInventorySelectedItem]] - 1;
+				flixel_FlxG.game._state.add(new LandMine(flixel_FlxG.mouse.x,flixel_FlxG.mouse.y));
+			}
 			return;
 		}
 	}
@@ -9388,6 +9427,14 @@ Survivor.prototype = $extend(Entity.prototype,{
 		new flixel_util_FlxTimer().start(5,function(deltaTime) {
 			if(_gthis.health < 10 && _gthis.alive) {
 				_gthis.health++;
+			}
+		},0);
+	}
+	,restoreStaminaPeriodically: function() {
+		var _gthis = this;
+		new flixel_util_FlxTimer().start(2.5,function(deltaTime) {
+			if(_gthis._stamina < 10 && _gthis.alive) {
+				_gthis._stamina++;
 			}
 		},0);
 	}
@@ -78377,7 +78424,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 495328;
+	this.version = 671869;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = ["lime","utils","AssetCache"];
@@ -119981,7 +120028,7 @@ PlayState.WEAPON_PISTOL = 0;
 PlayState.WEAPON_RIFLE = 1;
 PlayState.LAND_MINE = 2;
 StringTools.winMetaCharacters = [32,40,41,37,33,94,34,60,62,38,124,10,13,44,59];
-Survivor.PLAYER_SPEED = 1.5;
+Survivor.PLAYER_SPEED = 1.25;
 Survivor.BULLET_SPEED = 2048;
 Survivor.FIRE_RATE_MAP = (function($this) {
 	var $r;

@@ -119,7 +119,7 @@ class Enemy extends Entity {
     var a = false;
     public function attack(mail:Mail, player:Survivor) {
         if (_attackTimer.active) return;
-        _attackTimer.start(ATTACK_TIME_INTERVAL, function(Timer:FlxTimer) { setSpritesheetAnim("move"); });
+        _attackTimer.start(ATTACK_TIME_INTERVAL, function(Timer:FlxTimer){ setSpritesheetAnim("move"); });
 
         var m:Message = new Message();
         m.from = this;

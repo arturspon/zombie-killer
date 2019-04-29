@@ -27,7 +27,7 @@ class Survivor extends Entity {
     var _staminaTimer = new FlxTimer();
 
     // Inventory
-    public var money:Float = 0.0;
+    public var money:Float = 5000.0;
     public var inventoryList:Array<Int> = [PlayState.WEAPON_PISTOL];    
     
 	 // Sound effects
@@ -35,15 +35,15 @@ class Survivor extends Entity {
 
     public function new(x:Int, y:Int, bullets:FlxTypedGroup<Bullet>) {
         super(x, y);
-        health = 10;
-        
+        health = 10;        
+
         loadGraphic(AssetPaths.survivor__png, true, 258, 220);
 
         setGraphicSize(24, 24);
         updateHitbox();
 
-        animation.add("movingHandgun", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 16, true);
-        animation.play("movingHandgun");
+        animation.add("moveHandgun", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 16, true);
+        animation.play("moveHandgun");
 
         _bullets = bullets;
         giveInitialBullets();
@@ -133,10 +133,19 @@ class Survivor extends Entity {
         
         if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_PISTOL ||
             inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) {
-                if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0) return;
+                if(itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem]) <= 0){
+                    //setSpritesheetAnim("move");
+                    return;
+                }
                 itemQtdMap.set(inventoryList[PlayState.currentInventorySelectedItem], itemQtdMap.get(inventoryList[PlayState.currentInventorySelectedItem])-1);
 
-                _shootTimer.start(FIRE_RATE_MAP.get(inventoryList[PlayState.currentInventorySelectedItem]));
+                setSpritesheetAnim("shoot");
+                _shootTimer.start(
+                    FIRE_RATE_MAP.get(inventoryList[PlayState.currentInventorySelectedItem]),
+                    function(Timer:FlxTimer) { 
+                        if(animation.finished) setSpritesheetAnim("move"); 
+                    }
+                );
 
                 _velocity.x = FlxG.mouse.x - x;
                 _velocity.y = FlxG.mouse.y - y;
@@ -166,22 +175,27 @@ class Survivor extends Entity {
         if(FlxG.keys.justPressed.ONE) {
             PlayState.currentInventorySelectedItem = 0;
             PlayState._hud.updateInventory();
+            updateSpritesheetBasedOnInventory();
         }
         if(FlxG.keys.justPressed.TWO) {
             PlayState.currentInventorySelectedItem = 1;
             PlayState._hud.updateInventory();
+            updateSpritesheetBasedOnInventory();
         }
         if(FlxG.keys.justPressed.THREE) {
             PlayState.currentInventorySelectedItem = 2;
             PlayState._hud.updateInventory();
+            updateSpritesheetBasedOnInventory();
         }
         if(FlxG.keys.justPressed.FOUR) {
             PlayState.currentInventorySelectedItem = 3;
             PlayState._hud.updateInventory();
+            updateSpritesheetBasedOnInventory();
         }
         if(FlxG.keys.justPressed.FIVE) {
             PlayState.currentInventorySelectedItem = 4;
             PlayState._hud.updateInventory();
+            updateSpritesheetBasedOnInventory();
         }
     }
 
@@ -204,4 +218,41 @@ class Survivor extends Entity {
             if(_stamina < 10 && alive) _stamina++;
         }, 0);
     }
+
+    function updateSpritesheetBasedOnInventory() {
+        if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_PISTOL){
+            setSpritesheetAnim("moveHandgun");
+        } else if (inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) {
+            setSpritesheetAnim("moveRifle");
+        }
+    }
+
+    function setSpritesheetAnim(animationName:String) {
+        if(animationName == animation.name) return;
+        if(animationName == "moveHandgun") {
+            loadGraphic(AssetPaths.survivor__png, true, 258, 220);
+            animation.add("moveHandgun", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 16, true);
+        } else if (animationName == "moveRifle") {
+            loadGraphic(AssetPaths.survivor_move_rifle__png, true, 313, 206);
+            animation.add("moveRifle", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], 16, true);
+        } else if(animationName == "shoot") {
+            if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_PISTOL){
+                loadGraphic(AssetPaths.survivor_shoot_handgun__png, true, 255, 215);
+                animation.add("shoot", [0,1,2], 12, false);
+            } else if (inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) {
+                loadGraphic(AssetPaths.survivor_shoot_rifle__png, true, 312, 206);
+                animation.add("shoot", [0,1,2], 12, false);
+            }
+        } else if(animationName == "move") {
+            if(inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_PISTOL){
+                setSpritesheetAnim("moveHandgun");
+            } else if (inventoryList[PlayState.currentInventorySelectedItem] == PlayState.WEAPON_RIFLE) {
+                setSpritesheetAnim("moveRifle");
+            }
+            return;
+        } else { return; }
+        setGraphicSize(24, 24);
+        updateHitbox();
+        animation.play(animationName);
+    }    
 }

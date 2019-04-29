@@ -116,9 +116,10 @@ class Enemy extends Entity {
         if(velocity.y > 0) velocity.y = 0;
     }
 
+    var a = false;
     public function attack(mail:Mail, player:Survivor) {
         if (_attackTimer.active) return;
-        _attackTimer.start(ATTACK_TIME_INTERVAL);
+        _attackTimer.start(ATTACK_TIME_INTERVAL, function(Timer:FlxTimer) { setSpritesheetAnim("move"); });
 
         var m:Message = new Message();
         m.from = this;
@@ -126,10 +127,24 @@ class Enemy extends Entity {
         m.op = Message.OP_DAMAGE;
         m.data = 1;
         mail.send(m);
+
+        setSpritesheetAnim("attack");
     }
 
     public function getSpeed():Float {
         return ENEMY_SPEED;
     }
-    
+
+    function setSpritesheetAnim(animationName:String) {
+        if(animationName == "move") {
+            loadGraphic(AssetPaths.zombie_running__png, true, 288, 311);
+            animation.add("move", [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], 16, true);
+        } else if (animationName == "attack") {
+            loadGraphic(AssetPaths.zombie_attack__png, true, 318, 294);
+            animation.add("attack", [0,1,2,3,4,5,6,7,8], 10, true);
+        }
+        setGraphicSize(24, 24);
+        updateHitbox();
+        animation.play(animationName);
+    }    
 }

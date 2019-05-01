@@ -48,14 +48,22 @@
 			font-style: normal;
 		}
 
+		.centerContent {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin-right: -50%;
+			transform: translate(-50%, -50%);
+		}
+
 	</style>
 	
 </head>
-<body>
+<body bgcolor="#000000">
 	
 	<noscript>This webpage makes extensive use of JavaScript. Please enable JavaScript in your web browser to view this page.</noscript>
 	
-	<div id="openfl-content"></div>
+	<div id="openfl-content" class="centerContent"></div>
 	
 	<script type="text/javascript">
 		lime.embed ("zombie-killer", "openfl-content", 640, 480, { parameters: {} });

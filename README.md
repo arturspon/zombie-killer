@@ -8,7 +8,7 @@ URL para jogar: https://arturspon.github.io/zombie-killer/
 ## O jogo
 Você é um sobrevivente de um apocalipse zumbi, seu passatempo agora é matar o máximo de zumbis possíveis.  
 Todavia, em uma de suas aventuras, você ficou preso em uma caverna cheia de mortos-vivos, sobreviva o máximo que conseguir!  Não se esqueça de comprar novas armas e minas terrestres para lhe ajudar!  
-<img src="docs/img/game.png" width="128" alt="O jogo">
+<img src="docs/img/game.png" width="512" alt="O jogo">
 
 ## Instruções
 * Movimente-se com ***W A S D***, mantendo ***SHIFT*** apertado para correr
@@ -22,9 +22,9 @@ Todavia, em uma de suas aventuras, você ficou preso em uma caverna cheia de mor
 ## Itens
 | Item | Descrição |
 | --- | --- |
-| <img src="docs/img/Tokarev_TT-33.png" width="128" alt="Pistola"> | Pistola inicial, ela tem no máximo 30 balas e recupera 1 bala a cada 1.5 segundos. |
-| <img src="docs/img/StG_44.png" width="128" alt="Rifle"> | O rifle pode ser comprado na loja e custa $2700, ele dispara projéteis a uma taxa de 666 RPM. |
-| <img src="docs/img/land_mine_icon.png" width="128" alt="Mina terreste"> | A mina terreste pode ser comprada por $500, causa grande dano em um determinado raio, porém não lhe dá dinheiro ao matar seus inimigos. |
+| <img src="docs/img/Tokarev_TT-33.png" width="96" alt="Pistola"> | Pistola inicial, ela tem no máximo 30 balas e recupera 1 bala a cada 1.5 segundos. |
+| <img src="docs/img/StG_44.png" width="96" alt="Rifle"> | O rifle pode ser comprado na loja e custa $2700, ele dispara projéteis a uma taxa de 666 RPM. |
+| <img src="docs/img/land_mine_icon.png" width="96" alt="Mina terreste"> | A mina terreste pode ser comprada por $500, causa grande dano em um determinado raio, porém não lhe dá dinheiro ao matar seus inimigos. |
 
 ## Licença
 [MIT](https://choosealicense.com/licenses/mit/)

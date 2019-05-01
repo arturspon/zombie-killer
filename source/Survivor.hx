@@ -27,7 +27,7 @@ class Survivor extends Entity {
     var _staminaTimer = new FlxTimer();
 
     // Inventory
-    public var money:Float = 5000.0;
+    public var money:Float = 0.0;
     public var inventoryList:Array<Int> = [PlayState.WEAPON_PISTOL];    
     
 	 // Sound effects

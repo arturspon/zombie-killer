@@ -134,7 +134,7 @@ class PlayState extends FlxState {
 
 		if(_survivor.health <= 0) {
 			FlxG.camera.fade(FlxColor.BLACK,.33, false, function() {
-				FlxG.switchState(new MenuState());
+				FlxG.switchState(new GameOverState());
 			});
 		}
 	}

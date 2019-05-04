@@ -1,5 +1,6 @@
 package;
 
+import flixel.util.FlxColor;
 import flixel.ui.FlxButton;
 import flixel.FlxG;
 import flixel.FlxState;
@@ -17,22 +18,37 @@ class MenuState extends FlxState {
         btnStart.x = FlxG.width / 2 - btnStart.width / 2;
         btnStart.y = gameTitle.y + 128;
 
+        var btnTutorial = new FlxButton(0, 0, "Tutorial", gotoTutorial);
+        btnTutorial.x = FlxG.width / 2 - btnTutorial.width / 2;
+        btnTutorial.y = btnStart.y + btnStart.height + 4;
+
         var btnCredits = new FlxButton(0, 0, "Credits", gotoCredits);
         btnCredits.x = FlxG.width / 2 - btnCredits.width / 2;
-        btnCredits.y = btnStart.y + btnStart.height + 4;
+        btnCredits.y = btnTutorial.y + btnTutorial.height + 4;
 
         add(gameTitle);
         add(btnStart);
+        add(btnTutorial);
         add(btnCredits);
 
         super.create();
     }
 
     function startGame() {
-        FlxG.switchState(new PlayState());
+        FlxG.camera.fade(FlxColor.BLACK, .33, false, function() {
+            FlxG.switchState(new PlayState());
+        });
+    }
+
+    function gotoTutorial():Void{
+        FlxG.camera.fade(FlxColor.BLACK, .33, false, function() {
+            FlxG.switchState(new TutorialState());
+        });
     }
 
     function gotoCredits() {
-        FlxG.switchState(new CreditsState());
+        FlxG.camera.fade(FlxColor.BLACK, .33, false, function() {
+            FlxG.switchState(new CreditsState());
+        });
     }
 }

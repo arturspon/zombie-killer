@@ -12,6 +12,7 @@ import flixel.FlxState;
 import flixel.group.FlxGroup;
 import flixel.math.FlxRandom;
 import flixel.tile.FlxTilemap;
+import flixel.text.FlxText;
 
 class PlayState extends FlxState {
 	public static var _hud:HUD;
@@ -68,6 +69,17 @@ class PlayState extends FlxState {
 	// Mail	
     public static var MAIL:Mail;
 
+	// Tutorial
+	static var _TUTORIAL_TEXTS:Array<String> = [
+		"Use the keys W A S D to move your character",
+		"You can boost your speed by holding SHIFT",
+		"Choose between your inventory items by pressing the corresponding number",
+		"Buy new items by pressing B",
+		"The game ends when you die!"
+	];
+	var currentTutorialTextShown:Int = 0;
+	var tutorialText:FlxText = new FlxText(0, 0, "", 12);
+
 	override public function create():Void {
 		// Mail
         MAIL = new Mail();
@@ -94,12 +106,15 @@ class PlayState extends FlxState {
 		add(_survivor);
 		add(_bullets);
 		add(enemies);
+		add(tutorialText);
 
 		_hud = new HUD(_survivor);
 		add(_hud);
 
 		populateWave();
-		enemySpawner(null);	
+		enemySpawner(null);
+
+		showTutorial();
 
 		super.create();
 	}
@@ -214,5 +229,27 @@ class PlayState extends FlxState {
 		} else {
 			enemy.chasePlayerM();
 		}
+	}
+
+	function showTutorial() {
+		tutorialText.text = _TUTORIAL_TEXTS[0];
+		tutorialText.x = FlxG.width / 2 - tutorialText.width / 2;
+		tutorialText.y = FlxG.height - 48;
+		currentTutorialTextShown++;
+		var tutorialTimer;
+		tutorialTimer = new FlxTimer().start(5, function(deltaTime:FlxTimer) {
+			tutorialText.text = _TUTORIAL_TEXTS[currentTutorialTextShown];
+			tutorialText.x = FlxG.width / 2 - tutorialText.width / 2;
+			currentTutorialTextShown++;
+
+			FlxG.log.add(currentTutorialTextShown + " / " + _TUTORIAL_TEXTS.length);
+
+			if(currentTutorialTextShown == _TUTORIAL_TEXTS.length) {
+				new FlxTimer().start(5, function(deltaTime:FlxTimer) {
+					tutorialText.destroy();
+				}, 0);
+				tutorialTimer.destroy();
+			}
+		}, _TUTORIAL_TEXTS.length - 1);
 	}
 }

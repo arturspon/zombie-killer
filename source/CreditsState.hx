@@ -1,5 +1,6 @@
 package;
 
+import flixel.util.FlxColor;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.text.FlxText;
@@ -37,7 +38,9 @@ class CreditsState extends FlxState {
     }
 
     function gotoMenu():Void{
-        FlxG.switchState(new MenuState());
+        FlxG.camera.fade(FlxColor.BLACK, .33, false, function() {
+            FlxG.switchState(new MenuState());
+        });
     }
 
     override public function update(elapsed:Float):Void{

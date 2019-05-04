@@ -179,7 +179,6 @@ class PlayState extends FlxState {
 		var enemy:Enemy = enemies.getFirstAvailable();
 		if(SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.get(currentWave) != null) {
 			enemy.reset(SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.get(currentWave).x, SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.get(currentWave).y);
-			FlxG.log.add(SPECIAL_ENEMY_SPAWN_POINT_BY_WAVE_MAP.get(currentWave));
 		} else {
 			enemy.reset(pointToSpawn.x, pointToSpawn.y);
 		}
@@ -241,8 +240,6 @@ class PlayState extends FlxState {
 			tutorialText.text = _TUTORIAL_TEXTS[currentTutorialTextShown];
 			tutorialText.x = FlxG.width / 2 - tutorialText.width / 2;
 			currentTutorialTextShown++;
-
-			FlxG.log.add(currentTutorialTextShown + " / " + _TUTORIAL_TEXTS.length);
 
 			if(currentTutorialTextShown == _TUTORIAL_TEXTS.length) {
 				new FlxTimer().start(5, function(deltaTime:FlxTimer) {
